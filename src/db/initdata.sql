@@ -49,3 +49,12 @@ INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `men
 INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`) VALUES(37, 3, 'Закупки', 'GRList', '', '', 0, 0);
 INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`) VALUES(39, 3, 'Заявки поставщикам', 'OrderCustList', '', '', 0, 0);
 INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`) VALUES(40, 2, 'Прайс', 'Price', 'Склад', '', 0, 0);
+
+
+
+INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(1, 'Гривна', 'грн', 'коп', '₴', 'UAH', 980);
+INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(2, 'Доллар США', '', '', '$', 'USD', 840);
+INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(3, 'Евро', '', '', '€', 'EUR', 978);
+INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(4, 'Российский рубль', '', '', '₽', 'RUR', 643);
+INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(5, 'Английский фунт', '', '', '£', 'GBP', 826);
+INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(6, 'Польский злотый', '', '', '', 'PLN', 985);
