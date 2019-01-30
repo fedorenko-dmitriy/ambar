@@ -57,3 +57,15 @@ INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `c
 INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(4, 'Российский рубль', '', '', '₽', 'RUR', 643);
 INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(5, 'Английский фунт', '', '', '£', 'GBP', 826);
 INSERT INTO `metadata` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(6, 'Польский злотый', '', '', '', 'PLN', 985);
+
+
+INSERT INTO `metadata` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(1, 'шт.', 'штука', '');
+INSERT INTO `metadata` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(2, 'уп.', 'упаковка', '');
+INSERT INTO `metadata` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(3, 'ящ.', 'ящик', '');
+INSERT INTO `metadata` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(4, 'кг.', 'киллограмм', '');
+INSERT INTO `metadata` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(5, 'т.', 'тонна', '');
+INSERT INTO `metadata` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(6, 'куб.м.', 'кубический метр', '');
+INSERT INTO `metadata` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(7, 'л.', 'литр', '');
+INSERT INTO `metadata` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(7, 'ч.', 'час', '');
+
+
