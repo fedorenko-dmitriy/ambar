@@ -19,4 +19,5 @@ class Currency extends \ZCL\DB\Entity
         return Currency::findArray("currency_name", "");
     }
 
+
 }

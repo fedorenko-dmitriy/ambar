@@ -66,4 +66,3 @@ INSERT INTO `messures` (`messure_id`, `messure_short_name`, `currency_main_name`
 INSERT INTO `messures` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(6, 'куб.м.', 'кубический метр', '');
 INSERT INTO `messures` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(7, 'л.', 'литр', '');
 INSERT INTO `messures` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(7, 'ч.', 'час', '');
-

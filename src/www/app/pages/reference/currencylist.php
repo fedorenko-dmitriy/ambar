@@ -30,6 +30,7 @@ class CurrencyList extends \App\Pages\Base
 
         $currencypanel = $this->add(new Panel('currencytable'));
         $currencypanel->add(new DataView('currencylist', new \ZCL\DB\EntityDataSource('\App\Entity\Currency'), $this, 'currencyListOnRow'));
+
         $currencypanel->add(new ClickLink('addnew'))->onClick($this, 'addOnClick');
         $this->add(new Form('currencyform'))->setVisible(false);
 
