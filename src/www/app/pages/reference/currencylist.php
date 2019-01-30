@@ -29,7 +29,7 @@ class CurrencyList extends \App\Pages\Base
             return;
 
         $currencypanel = $this->add(new Panel('currencytable'));
-        $currencypanel->add(new DataView('currencylist', new \ZCL\DB\EntityDataSource('\App\Entity\Currency'), $this, 'currencylistOnRow'));
+        $currencypanel->add(new DataView('currencylist', new \ZCL\DB\EntityDataSource('\App\Entity\Currency'), $this, 'currencyListOnRow'));
         $currencypanel->add(new ClickLink('addnew'))->onClick($this, 'addOnClick');
         $this->add(new Form('currencyform'))->setVisible(false);
 
@@ -45,7 +45,7 @@ class CurrencyList extends \App\Pages\Base
         $this->currencytable->currencylist->Reload();
     }
 
-    public function currencylistOnRow($row) {
+    public function currencyListOnRow($row) {
         $item = $row->getDataItem();
 
         $row->add(new Label('currency_id', $item->currency_id));
@@ -77,7 +77,7 @@ class CurrencyList extends \App\Pages\Base
         if (false == \App\ACL::checkEditRef('CurrencyList'))
             return;
 
-        if (false == Store::delete($sender->owner->getDataItem()->currency_id)) {
+        if (false == Currency::delete($sender->owner->getDataItem()->currency_id)) {
             $this->setError("Нельзя удалить эту валюту"); //ToDo вынести в локаль
             return;
         }
@@ -100,7 +100,7 @@ class CurrencyList extends \App\Pages\Base
     }
 
     public function currencySaveOnClick($sender) {
-        if (false == \App\ACL::checkEditRef('StoreList'))
+        if (false == \App\ACL::checkEditRef('CurrencyList'))
             return;
 
         $this->_currency->currency_name = $this->currencyform->edit_currency_name->getText();

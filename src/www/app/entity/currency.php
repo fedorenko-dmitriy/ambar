@@ -15,8 +15,8 @@ class Currency extends \ZCL\DB\Entity
         $this->currency_id = 0;
     }
 
-    // public static function getList() {
-    //     return Currency::findArray("storename", "");
-    // }
+    public static function getList() {
+        return Currency::findArray("currency_name", "");
+    }
 
 }
