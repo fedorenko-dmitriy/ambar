@@ -285,7 +285,7 @@ CREATE TABLE `items` (
   `item_code` varchar(64) DEFAULT NULL,
   `bar_code` varchar(64) DEFAULT NULL,
   `cat_id` int(11) NOT NULL,
-  `msr` varchar(64) DEFAULT NULL,
+  `msr_id` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`item_id`),
   KEY `item_code` (`item_code`),
   KEY `itemname` (`itemname`),
@@ -303,7 +303,7 @@ SET character_set_client = utf8;
  1 AS `detail`,
  1 AS `item_code`,
  1 AS `bar_code`,
- 1 AS `msr`,
+ 1 AS `msr_id`,
  1 AS `cat_id`,
  1 AS `cat_name`,
  1 AS `qty`*/;
@@ -568,7 +568,7 @@ SET character_set_client = utf8;
  1 AS `itemname`,
  1 AS `item_code`,
  1 AS `cat_id`,
- 1 AS `msr`,
+ 1 AS `msr_id`,
  1 AS `bar_code`,
  1 AS `cat_name`,
  1 AS `storename`,
@@ -675,7 +675,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = latin1_swedish_ci */;
 /*!50001 CREATE  */
 /*!50013  */
-/*!50001 VIEW `items_view` AS select `items`.`item_id` AS `item_id`,`items`.`itemname` AS `itemname`,`items`.`description` AS `description`,`items`.`detail` AS `detail`,`items`.`item_code` AS `item_code`,`items`.`bar_code` AS `bar_code`,`items`.`msr` AS `msr`,`items`.`cat_id` AS `cat_id`,`item_cat`.`cat_name` AS `cat_name`,(select sum(`store_stock`.`qty`) from `store_stock` where (`store_stock`.`item_id` = `items`.`item_id`)) AS `qty` from (`items` left join `item_cat` on((`items`.`cat_id` = `item_cat`.`cat_id`))) */;
+/*!50001 VIEW `items_view` AS select `items`.`item_id` AS `item_id`,`items`.`itemname` AS `itemname`,`items`.`description` AS `description`,`items`.`detail` AS `detail`,`items`.`item_code` AS `item_code`,`items`.`bar_code` AS `bar_code`,`items`.`msr_id` AS `msr_id`,`items`.`cat_id` AS `cat_id`,`item_cat`.`cat_name` AS `cat_name`,(select sum(`store_stock`.`qty`) from `store_stock` where (`store_stock`.`item_id` = `items`.`item_id`)) AS `qty` from (`items` left join `item_cat` on((`items`.`cat_id` = `item_cat`.`cat_id`))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -740,7 +740,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = latin1_swedish_ci */;
 /*!50001 CREATE  */
 /*!50013  */
-/*!50001 VIEW `store_stock_view` AS select `st`.`stock_id` AS `stock_id`,`st`.`item_id` AS `item_id`,`st`.`partion` AS `partion`,`st`.`store_id` AS `store_id`,`i`.`itemname` AS `itemname`,`i`.`item_code` AS `item_code`,`i`.`cat_id` AS `cat_id`,`i`.`msr` AS `msr`,`i`.`bar_code` AS `bar_code`,`i`.`cat_name` AS `cat_name`,`stores`.`storename` AS `storename`,`st`.`qty` AS `qty` from ((`store_stock` `st` join `items_view` `i` on((`i`.`item_id` = `st`.`item_id`))) join `stores` on((`stores`.`store_id` = `st`.`store_id`))) where (`st`.`qty` <> 0) */;
+/*!50001 VIEW `store_stock_view` AS select `st`.`stock_id` AS `stock_id`,`st`.`item_id` AS `item_id`,`st`.`partion` AS `partion`,`st`.`store_id` AS `store_id`,`i`.`itemname` AS `itemname`,`i`.`item_code` AS `item_code`,`i`.`cat_id` AS `cat_id`,`i`.`msr_id` AS `msr_id`,`i`.`bar_code` AS `bar_code`,`i`.`cat_name` AS `cat_name`,`stores`.`storename` AS `storename`,`st`.`qty` AS `qty` from ((`store_stock` `st` join `items_view` `i` on((`i`.`item_id` = `st`.`item_id`))) join `stores` on((`stores`.`store_id` = `st`.`store_id`))) where (`st`.`qty` <> 0) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;

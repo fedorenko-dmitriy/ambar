@@ -15,6 +15,7 @@ use \Zippy\Html\Link\ClickLink;
 use \Zippy\Html\Panel;
 use \App\Entity\Item;
 use \App\Entity\Category;
+use \App\Entity\Messure;
 use \App\System;
 
 class ItemList extends \App\Pages\Base
@@ -77,8 +78,9 @@ class ItemList extends \App\Pages\Base
             $this->itemdetail->editprice5->setVisible(false);
         }
         $this->itemdetail->add(new TextInput('editbarcode'));
-        $this->itemdetail->add(new TextInput('editmsr'));
-        $this->itemdetail->add(new DropDownChoice('editcat', Category::findArray("cat_name", "", "cat_name"), 0));
+    
+        $this->itemdetail->add(new DropDownChoice('editmsr', Messure::findArray("messure_main_name")));
+        $this->itemdetail->add(new DropDownChoice('editcat', Category::findArray("cat_name", "", "cat_name"), 0)); 
         $this->itemdetail->add(new TextInput('editcode'));
         $this->itemdetail->add(new TextArea('editdescription'));
 
@@ -97,7 +99,7 @@ class ItemList extends \App\Pages\Base
         $item = $row->getDataItem();
         $row->add(new Label('itemname', $item->itemname));
         $row->add(new Label('code', $item->item_code));
-        $row->add(new Label('msr', $item->msr));
+        $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id]));
         $row->add(new Label('cat_name', $item->cat_name));
         $plist = array();
         if ($item->price1 > 0)
@@ -129,8 +131,6 @@ class ItemList extends \App\Pages\Base
             return;
         }
 
-
-
         $this->itemtable->itemlist->Reload();
     }
 
@@ -150,7 +150,7 @@ class ItemList extends \App\Pages\Base
         $this->itemdetail->editdescription->setText($this->_item->description);
         $this->itemdetail->editcode->setText($this->_item->item_code);
         $this->itemdetail->editbarcode->setText($this->_item->bar_code);
-        $this->itemdetail->editmsr->setText($this->_item->msr);
+        $this->itemdetail->editmsr->setValue($this->_item->msr_id);
     }
 
     public function addOnClick($sender) {
@@ -158,7 +158,7 @@ class ItemList extends \App\Pages\Base
         $this->itemdetail->setVisible(true);
         // Очищаем  форму
         $this->itemdetail->clean();
-        $this->itemdetail->editmsr->setText('шт');
+        $this->itemdetail->editmsr->setValue();
         $this->_item = new Item();
     }
 
@@ -189,7 +189,7 @@ class ItemList extends \App\Pages\Base
         $this->_item->item_code = $this->itemdetail->editcode->getText();
 
         $this->_item->bar_code = $this->itemdetail->editbarcode->getText();
-        $this->_item->msr = $this->itemdetail->editmsr->getText();
+        $this->_item->msr_id = $this->itemdetail->editmsr->getValue();
         $this->_item->description = $this->itemdetail->editdescription->getText();
 
         $this->_item->Save();
