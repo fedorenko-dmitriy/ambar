@@ -9,6 +9,19 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `currencies`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `currencies` (
+  `currency_id` int(11) NOT NULL,
+  `currency_name` varchar(50) NOT NULL,
+  `currency_main_name` varchar(50) NOT NULL,
+  `currency_coin_name` varchar(50) NOT NULL,
+  `currency_symbol` varchar(2) NOT NULL,
+  `iso_code` varchar(4) NOT NULL,
+  `iso_number` int(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `customers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -321,6 +334,17 @@ SET character_set_client = utf8;
  1 AS `item_type`,
  1 AS `username`*/;
 SET character_set_client = @saved_cs_client;
+
+DROP TABLE IF EXISTS `messures`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `messures` (
+  `messure_id` int(11) NOT NULL AUTO_INCREMENT,
+  `messure_short_name` varchar(50) NOT NULL,
+  `messure_main_name` varchar(50) NOT NULL,
+  `messure_second_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`messure_id`)
+
 DROP TABLE IF EXISTS `metadata`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
