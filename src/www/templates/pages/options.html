@@ -1,212 +1,222 @@
 <html>
     <body>
         <h2>Настройки системы </h2>
-        <div class="row">
-            <div class="col-12 col-md-6 col-lg-4  mt-4  ">
-                <h4>Основные</h4>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="main-preference-tab" data-toggle="tab" href="#main-preference" role="tab">Основные настройки</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="menu-preference-tab" data-toggle="tab" href="#menu-preference" role="tab">Настройка меню</a>
+          </li>
+<!--           <li class="nav-item">
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+          </li> -->
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="main-preference" role="tabpanel" aria-labelledby="main-preference-tab">
+              <div class="row">
+                    <div class="col-12 col-md-6 col-lg-4  mt-4  ">
+                        <h4>Основные настройки</h4>
 
-                <form   zippy="common"  >
-
-                    <div class="form-group">
-                        <label for="firmname" >Название фирмы</label>
-                        <input class="form-control" type="text" zippy="firmname" required="required"   >
-                    </div>   
-                    <div class="form-group  ">
-                        <label for="defstore" >Склад по умолчанию</label>
-
-                        <select class="form-control" zippy="defstore">
-                            <option value='0'>Не выбран</option>
-                        </select>
-                    </div>  
-                    <div class="form-group  ">
-                        <label >Типы отпускных цен</label>
-                        <input class="form-control" type="text" zippy="price1" required="required"   >
-                        <input class="form-control" type="text" zippy="price2"     >
-                        <input class="form-control" type="text" zippy="price3"     >
-                        <input class="form-control" type="text" zippy="price4"    >
-                        <input class="form-control" type="text" zippy="price5"     >
-                        <small>Введите наименования типов цен. Ненужные поля оставте пустыми</small>
-
-                    </div> 
-                    <div class="form-group  ">
-                        <label for="qtydigits" >Знаков после точки  в количестве</label>
-
-                        <select style="width:75px;" class="form-control" zippy="qtydigits">
-                            <option value='0'>0</option>
-                            <option value='1'>1</option>
-                            <option value='2'>2</option>
-                            <option value='3'>3</option>
-                        </select>
-                    </div> 
-                    <div class="form-check">
-                        <input zippy="useval" type="checkbox" class="form-check-input"  >
-                        <label class="form-check-label" for="useval">Использовать валюту при закупке</label>
-                    </div>                               
-                    <div class="form-group">
-                        <label data-label="cdoll" for="cdoll" >Курс доллара</label>
-                        <input style="width:100px;" class="form-control" type="text" zippy="cdoll"   pattern="[0-9\.]+"    >
-                    </div>
-
-                    <div class="form-group">
-                        <label data-label="ceuro" for="ceuro" >Курс евро</label>
-                        <input style="width:100px;" class="form-control" type="text" zippy="ceuro"  pattern="[0-9\.]+"   >
-                    </div>            
-                    <div class="form-group">
-                        <label data-label="crub" for="crub" >Курс рубля</label>
-                        <input  style="width:100px;" class="form-control" type="text" zippy="crub"   pattern="[0-9\.]+"    >
-                    </div>            
-
-                    <div class="form-group">
-                        <button class="btn btn-outline-primary" type="submit"  >Сохранить</button>
-                    </div>
-
-                </form>
-            </div>
-            {{#shop}}
-            <div class="col-12 col-md-6 col-lg-4  mt-4">
-                <h4>Онлайн каталог</h4>
-
-                <form   zippy="shop"  >
-                    <div class="form-group  ">
-                        <label for="shopdefstore" >Склад для онлайна</label>
-                        <select class="form-control" zippy="shopdefstore">
-                        </select>
-                    </div>                    
-                    <div class="form-group  ">
-                        <label for="shopdefpricetype" >Тип  цены  </label>
-                        <select class="form-control" zippy="shopdefpricetype">
-                        </select>
-                    </div>                    
-                    <div class="form-group  ">
-                        <label for="shopdefcust" >Покупатель по умолчанию</label>
-                        <select class="form-control select2" zippy="shopdefcust">
-                        </select>
-                        <small>Условный контрагент от имени  котрого будут  формироватся заказы</small>
-                    </div>                    
-
-
-
-                    <div class="form-group">
-                        <button class="btn btn-outline-primary" type="submit"  >Сохранить</button>
-                    </div>
-
-                </form>
-            </div>
-            {{/shop}}
-
-        </div>
-        <div class="row">
-            <div class="col-12 col-md-10 col-lg-8  mt-4">
-                <h4>Настройка меню</h4>
-                <div zippy="listpan">
-                    <div class="row">
-                        <div class="col-12  ">
-                            <form zippy="filter" class="form-inline" role="form">
-                                <div class="form-check   ">
-
-                                    <input class="form-check-input"  type="checkbox" zippy="fdoc">
-                                    <label class="form-check-label mr-sm-2" for="fdoc">Документы</label>
-                                </div>               
-
-                                <div class="form-check   ">
-
-                                    <input class="form-check-input"  type="checkbox" zippy="fdic">
-                                    <label class="form-check-label mr-sm-2" for="fdic">Справочники</label>
-                                </div>               
-                                <div class="form-check   ">
-
-                                    <input class="form-check-input"  type="checkbox" zippy="frep">
-                                    <label class="form-check-label mr-sm-2" for="frep">Отчеты</label>
-                                </div>               
-                                <div class="form-check   ">
-
-                                    <input class="form-check-input"  type="checkbox" zippy="freg">
-                                    <label class="form-check-label mr-sm-2" for="freg">Журналы</label>
-                                </div>               
-                                {{#shop}}
-                                <div class="form-check   ">
-
-                                    <input class="form-check-input"  type="checkbox" zippy="fshop">
-                                    <label class="form-check-label mr-sm-2" for="fshop">Онлайн кат.</label>
-                                </div>               
-                                {{/shop}}
-                                <button type="submit" class="btn btn-outline-success   ">Обновить</button>
-                            </form>
-                            <a class="btn btn-outline-info   " zippy="addnew">Добавить</a>
-                            <table class="table table-sm table-striped  ">
-                                <tr>
-                                    <th>Название</th>
-                                    <th>Имя PHP класса</th>
-                                    <th>Тип</th>
-                                    <th>Группа</th>
-                                    <th></th>
-                                </tr>
-                                <tr zippy="metarow">
-                                    <td><span zippy="description"></span></td>
-                                    <td><span zippy="meta_name"></span></td>
-                                    <td><span zippy="type"></span></td>
-                                    <td><span zippy="menugroup"></span></td>
-                                    <td style="white-space:   nowrap"><a zippy="rowedit"><i class="fa fa-edit"></a> <a
-                                            zippy="rowdelete"> <i class="fa fa-trash"></a></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12  col-md-8 col-lg-6">
-                    <div zippy="editpan">
-                        <h5> Редактирование страницы</h5>
-                        <form zippy="editform" role="form">
-                            <input type="hidden" zippy="meta_id" value="0">
+                        <form zippy="common"  >
 
                             <div class="form-group">
-                                <label for="edit_description">Наименование</label>
-                                <input class="form-control" zippy="edit_description" required="required">
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_meta_name">Имя PHP класса</label>
-                                <input class="form-control" zippy="edit_meta_name" required="required">
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_menugroup">Группа  подменю</label>
-                                <input class="form-control" zippy="edit_menugroup">
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_menugroup">Тип</label>
-                                <select class="form-control" zippy="edit_meta_type">
+                                <label for="firmname" >Название фирмы</label>
+                                <input class="form-control" type="text" zippy="firmname" required="required"   >
+                            </div>   
+                            <div class="form-group  ">
+                                <label for="defstore" >Склад по умолчанию</label>
 
+                                <select class="form-control" zippy="defstore">
+                                    <option value='0'>Не выбран</option>
                                 </select>
-                            </div>
+                            </div>  
+                            <div class="form-group  ">
+                                <label >Типы отпускных цен</label>
+                                <input class="form-control" type="text" zippy="price1" required="required"   >
+                                <input class="form-control" type="text" zippy="price2"     >
+                                <input class="form-control" type="text" zippy="price3"     >
+                                <input class="form-control" type="text" zippy="price4"    >
+                                <input class="form-control" type="text" zippy="price5"     >
+                                <small>Введите наименования типов цен. Ненужные поля оставте пустыми</small>
+
+                            </div> 
+                            <div class="form-group  ">
+                                <label for="qtydigits" >Знаков после точки  в количестве</label>
+
+                                <select style="width:75px;" class="form-control" zippy="qtydigits">
+                                    <option value='0'>0</option>
+                                    <option value='1'>1</option>
+                                    <option value='2'>2</option>
+                                    <option value='3'>3</option>
+                                </select>
+                            </div> 
+                            <div class="form-check">
+                                <input zippy="useval" type="checkbox" class="form-check-input"  >
+                                <label class="form-check-label" for="useval">Использовать валюту при закупке</label>
+                            </div>                               
                             <div class="form-group">
-                                <label for="edit_menugroup">Описание</label>
-                                <textarea style="height: 120px;" class="form-control" zippy="edit_notes"></textarea>
+                                <label data-label="cdoll" for="cdoll" >Курс доллара</label>
+                                <input style="width:100px;" class="form-control" type="text" zippy="cdoll"   pattern="[0-9\.]+"    >
                             </div>
-                            <div class="form-check   ">
-
-                                <input class="form-check-input"  type="checkbox" zippy="edit_disabled">
-                                <label class="form-check-label mr-sm-2" for="edit_disabled">Не показывать в меню</label>
-                            </div>                                    
-                            <div class="form-check   ">
-
-                                <input class="form-check-input"  type="checkbox" zippy="edit_smart">
-                                <label class="form-check-label mr-sm-2" for="edit_smart">Показывать в  оперативном меню</label>
-                            </div>                                    
 
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary  ">Сохранить</button>
-                                &nbsp;&nbsp;&nbsp; <a zippy="mcancel" class="btn btn-light  ">Отменить</a>
+                                <label data-label="ceuro" for="ceuro" >Курс евро</label>
+                                <input style="width:100px;" class="form-control" type="text" zippy="ceuro"  pattern="[0-9\.]+"   >
+                            </div>            
+                            <div class="form-group">
+                                <label data-label="crub" for="crub" >Курс рубля</label>
+                                <input  style="width:100px;" class="form-control" type="text" zippy="crub"   pattern="[0-9\.]+"    >
+                            </div>            
+
+                            <div class="form-group">
+                                <button class="btn btn-outline-primary" type="submit"  >Сохранить</button>
                             </div>
 
                         </form>
                     </div>
+                    {{#shop}}
+                    <div class="col-12 col-md-6 col-lg-4  mt-4">
+                        <h4>Онлайн каталог</h4>
 
+                        <form   zippy="shop"  >
+                            <div class="form-group  ">
+                                <label for="shopdefstore" >Склад для онлайна</label>
+                                <select class="form-control" zippy="shopdefstore">
+                                </select>
+                            </div>                    
+                            <div class="form-group  ">
+                                <label for="shopdefpricetype" >Тип  цены  </label>
+                                <select class="form-control" zippy="shopdefpricetype">
+                                </select>
+                            </div>                    
+                            <div class="form-group  ">
+                                <label for="shopdefcust" >Покупатель по умолчанию</label>
+                                <select class="form-control select2" zippy="shopdefcust">
+                                </select>
+                                <small>Условный контрагент от имени  котрого будут  формироватся заказы</small>
+                            </div>                    
+
+
+
+                            <div class="form-group">
+                                <button class="btn btn-outline-primary" type="submit"  >Сохранить</button>
+                            </div>
+
+                        </form>
+                    </div>
+                    {{/shop}}
                 </div>
+          </div>
+          <div class="tab-pane fade" id="menu-preference" role="tabpanel" aria-labelledby="menu-preference-tab">
+              <div class="row">
+                <div class="col-12 col-md-10 col-lg-8  mt-4">
+                    <h4>Настройка меню</h4>
+                    <div zippy="listpan">
+                        <div class="row">
+                            <div class="col-12  ">
+                                <form zippy="filter" class="form-inline" role="form">
+                                    <div class="form-check   ">
 
+                                        <input class="form-check-input"  type="checkbox" zippy="fdoc">
+                                        <label class="form-check-label mr-sm-2" for="fdoc">Документы</label>
+                                    </div>               
 
+                                    <div class="form-check   ">
+
+                                        <input class="form-check-input"  type="checkbox" zippy="fdic">
+                                        <label class="form-check-label mr-sm-2" for="fdic">Справочники</label>
+                                    </div>               
+                                    <div class="form-check   ">
+
+                                        <input class="form-check-input"  type="checkbox" zippy="frep">
+                                        <label class="form-check-label mr-sm-2" for="frep">Отчеты</label>
+                                    </div>               
+                                    <div class="form-check   ">
+
+                                        <input class="form-check-input"  type="checkbox" zippy="freg">
+                                        <label class="form-check-label mr-sm-2" for="freg">Журналы</label>
+                                    </div>               
+                                    {{#shop}}
+                                    <div class="form-check   ">
+
+                                        <input class="form-check-input"  type="checkbox" zippy="fshop">
+                                        <label class="form-check-label mr-sm-2" for="fshop">Онлайн кат.</label>
+                                    </div>               
+                                    {{/shop}}
+                                    <button type="submit" class="btn btn-outline-success   ">Обновить</button>
+                                </form>
+                                <a class="btn btn-outline-info   " zippy="addnew">Добавить</a>
+                                <table class="table table-sm table-striped  ">
+                                    <tr>
+                                        <th>Название</th>
+                                        <th>Имя PHP класса</th>
+                                        <th>Тип</th>
+                                        <th>Группа</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr zippy="metarow">
+                                        <td><span zippy="description"></span></td>
+                                        <td><span zippy="meta_name"></span></td>
+                                        <td><span zippy="type"></span></td>
+                                        <td><span zippy="menugroup"></span></td>
+                                        <td style="white-space:   nowrap"><a zippy="rowedit"><i class="fa fa-edit"></a> <a
+                                                zippy="rowdelete"> <i class="fa fa-trash"></a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12  col-md-8 col-lg-6">
+                        <div zippy="editpan">
+                            <h5> Редактирование страницы</h5>
+                            <form zippy="editform" role="form">
+                                <input type="hidden" zippy="meta_id" value="0">
+
+                                <div class="form-group">
+                                    <label for="edit_description">Наименование</label>
+                                    <input class="form-control" zippy="edit_description" required="required">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit_meta_name">Имя PHP класса</label>
+                                    <input class="form-control" zippy="edit_meta_name" required="required">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit_menugroup">Группа  подменю</label>
+                                    <input class="form-control" zippy="edit_menugroup">
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit_menugroup">Тип</label>
+                                    <select class="form-control" zippy="edit_meta_type">
+
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit_menugroup">Описание</label>
+                                    <textarea style="height: 120px;" class="form-control" zippy="edit_notes"></textarea>
+                                </div>
+                                <div class="form-check   ">
+
+                                    <input class="form-check-input"  type="checkbox" zippy="edit_disabled">
+                                    <label class="form-check-label mr-sm-2" for="edit_disabled">Не показывать в меню</label>
+                                </div>                                    
+                                <div class="form-check   ">
+
+                                    <input class="form-check-input"  type="checkbox" zippy="edit_smart">
+                                    <label class="form-check-label mr-sm-2" for="edit_smart">Показывать в  оперативном меню</label>
+                                </div>                                    
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary  ">Сохранить</button>
+                                    &nbsp;&nbsp;&nbsp; <a zippy="mcancel" class="btn btn-light  ">Отменить</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-
+          </div>
+          <!-- <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div> -->
         </div>
-
     </body>
 </html>
