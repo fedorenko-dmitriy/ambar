@@ -3,7 +3,7 @@ SET NAMES 'utf8';
 
 
  
-INSERT   INTO `users` (  `userlogin`, `userpass`, `createdon`, `active`, `email`, `acl`, `smartmenu`, `order`, `order`) VALUES(  'admin', '$2y$10$GsjC.thVpQAPMQMO6b4Ma.olbIFr2KMGFz12l5/wnmxI1PEqRDQf.', '2017-01-01', 1, 'admin@admin.admin', '<detail><acltype>1</acltype><onlymy></onlymy><aclview></aclview><acledit></acledit><widgets></widgets></detail>', NULL);
+INSERT   INTO `users` (  `userlogin`, `userpass`, `createdon`, `active`, `email`, `acl`, `smartmenu`) VALUES(  'admin', '$2y$10$GsjC.thVpQAPMQMO6b4Ma.olbIFr2KMGFz12l5/wnmxI1PEqRDQf.', '2017-01-01', 1, 'admin@admin.admin', '<detail><acltype>1</acltype><onlymy></onlymy><aclview></aclview><acledit></acledit><widgets></widgets></detail>', NULL);
 
  
 INSERT  INTO `stores` (  `storename`, `description`) VALUES(  'Основной склад', '');
@@ -11,7 +11,6 @@ INSERT  INTO `stores` (  `storename`, `description`) VALUES(  'Основной 
  
 INSERT  INTO `options` (`optname`, `optvalue`) VALUES('common', 'a:11:{s:8:"firmname";s:20:"Наша  фирма";s:8:"defstore";s:2:"19";s:5:"cdoll";s:1:"2";s:5:"ceuro";s:1:"5";s:4:"crub";s:3:"0.4";s:6:"price1";s:18:"Розничная";s:6:"price2";s:14:"Оптовая";s:6:"price3";s:0:"";s:6:"price4";s:0:"";s:6:"price5";s:0:"";s:6:"useval";b:0;}');
 INSERT  INTO `options` (`optname`, `optvalue`) VALUES('shop', 'a:3:{s:7:"defcust";s:1:"2";s:8:"defstore";s:2:"19";s:12:"defpricetype";s:6:"price2";}');
-
 
 INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`, `order`) VALUES(1, 4, 'Склады', 'StoreList', 'Товары', '', 0, 0, 0, 0);
 INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`, `order`) VALUES(2, 4, 'Номенклатура', 'ItemList', 'Товары', '', 0, 0, 0);
@@ -67,5 +66,4 @@ INSERT INTO `messures` (`messure_id`, `messure_short_name`, `currency_main_name`
 INSERT INTO `messures` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(6, 'куб.м.', 'кубический метр', '');
 INSERT INTO `messures` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(7, 'л.', 'литр', '');
 INSERT INTO `messures` (`messure_id`, `messure_short_name`, `currency_main_name`, `messure_second_name`) VALUES(7, 'ч.', 'час', '');
-
 
