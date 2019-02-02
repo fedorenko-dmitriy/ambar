@@ -16,6 +16,7 @@ use Zippy\Html\Panel;
 use Zippy\Html\Label;
 use Zippy\Html\Link\ClickLink;
 use App\Entity\Doc\Document;
+use App\Entity\Currency;
 use App\Helper as H;
 use App\Application as App;
 use App\System;
@@ -33,6 +34,7 @@ class OrderCustList extends \App\Pages\Base
      * @param mixed $docid Документ  должен  быть  показан  в  просмотре
      * @return DocList
      */
+
     public function __construct() {
         parent::__construct();
         if (false == \App\ACL::checkShowReg('OrderList'))
@@ -86,14 +88,13 @@ class OrderCustList extends \App\Pages\Base
         $doc = $row->getDataItem();
 
         $row->add(new Label('number', $doc->document_number));
-
         $row->add(new Label('date', date('d-m-Y', $doc->document_date)));
-        $row->add(new Label('onotes', $doc->notes));
-        $row->add(new Label('customer', $doc->customer_name));
-        $row->add(new Label('amount', $doc->amount));
-
         $row->add(new Label('state', Document::getStateName($doc->state)));
-       // if($doc->state == Document::STATE_EXECUTED) $row->state->setText('Выполняется');
+        $row->add(new Label('customer', $doc->customer_name));
+        $row->add(new Label('quantity', $doc->headerdata["order_quantity"]));
+        $row->add(new Label('amount', $doc->amount));
+        $row->add(new Label('currency', Currency::findArray("iso_code")[$doc->headerdata["currency_id"]]));
+        $row->add(new Label('onotes', $doc->notes));
 
         $row->add(new ClickLink('show'))->onClick($this, 'showOnClick');
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');

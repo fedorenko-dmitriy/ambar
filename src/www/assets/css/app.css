@@ -255,3 +255,11 @@ body.user-login .row.justify-content-center{
 /* add padding  */
 .left-addon input  { padding-left:  30px; }
 .right-addon input { padding-right: 30px; }
+
+
+/*REGISTER*/
+
+.col-form-label{
+    margin-right: 7px;
+    margin-left: 9px;
+}

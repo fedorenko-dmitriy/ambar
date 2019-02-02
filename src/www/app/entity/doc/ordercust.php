@@ -4,6 +4,7 @@ namespace App\Entity\Doc;
 
 use App\Entity\Entry;
 use App\Helper as H;
+use App\Entity\Currency;
 
 /**
  * Класс-сущность  документ приходная  накладая
@@ -19,13 +20,15 @@ class OrderCust extends Document
 
         $detail = array();
         foreach ($this->detaildata as $value) {
+            // var_dump($value);
             $detail[] = array("no" => $i++,
                 "itemname" => $value['itemname'],
                 "itemcode" => $value['item_code'],
                 "quantity" => H::fqty($value['quantity']),
                 "price" => $value['price'],
                 "msr" => $value['msr'],
-                "amount" => $value['amount']
+                "amount" => $value['amount'],
+                "currency" => Currency::findArray("iso_code")[$value["currency_id"]]
             );
         }
 
@@ -33,7 +36,8 @@ class OrderCust extends Document
             "_detail" => $detail,
             "customer_name" => $this->customer_name,
             "document_number" => $this->document_number,
-            "total" => $this->headerdata["total"]
+            "total" => $this->headerdata["total"],
+            "currency" => Currency::findArray("iso_code")[$this->headerdata["currency_id"]]
         );
 
 

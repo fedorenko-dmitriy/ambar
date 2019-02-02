@@ -20,8 +20,8 @@
                 </div>
                 <div class="col-12 col-md-3">
                      <div class="form-group">
-                        <label for="document_date">Валюта</label>
-                        <input class="form-control" type="text">
+                        <label for="document_currency">Валюта</label>
+                        <select class="form-control" zippy="document_currency"></select>
                     </div>  
                 </div>
                 <div class="col-12 col-md-3">               
@@ -41,7 +41,7 @@
                 <div class="col-12 col-md-3">
                     <div class="form-group">
                         <label for="customer">Номер договора</label>
-                        <input placeholder="Начните вводить..." class="form-control" />
+                        <input class="form-control" />
                     </div>
                 </div>
             </div>
@@ -64,15 +64,17 @@
                             <th>Кол.</th>
                             <th>Цена</th>
                             <th>Сумма</th>
+                            <th>Валюта</th>
                             <th width="50"></th>
                         </tr>
                         <tr zippy="detail">
                             <td zippy="code"></td>
                             <td zippy="item"></td>
                             <td zippy="msr"></td>
-                            <td zippy="quantity" class="text-right"></td>
-                            <td zippy="price" class="text-right"></td>
-                            <td zippy="amount" class="text-right"></td>
+                            <td zippy="quantity"></td>
+                            <td zippy="price"></td>
+                            <td zippy="amount"></td>
+                            <td zippy="currency"></td>
                             <td>
                                 <a zippy="edit"><i class="fa fa-edit"></i></a> 
                                 <a zippy="delete"> <i class="fa fa-trash"></i></a>
@@ -80,10 +82,13 @@
                         </tr>
                         <tr style="font-weight: bolder;">
                             <td class="text-right"><b>Итого:</b></td>
+                            <td></td>
                             <td class="text-right">Количество:</td>
-                            <td class="text-right"></td>
+                            <td zippy="order_quantity"></td>
                             <td class="text-right">Сумма:</td>
                             <td zippy="total" class="text-right"></td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     </table>
                 </div>
@@ -124,8 +129,8 @@
                     </div>
 
                     <div class="form-group">
-                        <input zippy="saverow" type="submit" value="Сохранить" class="btn btn-outline-primary" /> 
-                        <input type="button" zippy="cancelrow" value="Отменить" class="btn btn-light " />
+                        <button type="submit" zippy="saverow" class="btn btn-outline-primary">Сохранить</button> 
+                        <button type="button" zippy="cancelrow" class="btn btn-light ">Отменить</button> 
                     </div>
                 </div>
             </div>
