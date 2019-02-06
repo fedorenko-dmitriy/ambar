@@ -3,6 +3,23 @@
     </head>
 
     <body>
+        <script>
+            $(function () { 
+
+                $('.tree').jstree({ 
+                    'core' : {
+                        'data' : data
+                    }
+                }).on("changed.jstree", function(e, data){
+                    console.log(e);
+                    console.log("----");
+                    console.log(data.node.a_attr.class);
+                    console.log("====");
+
+                    $("table.table tr." + data.node.a_attr.class.replace(/\./g, "\\.")).toggle();
+                });
+            });
+        </script>
         <div class="row">
 
             <div class="col-12 col-md-10 col-xl-8" zippy="itemtable">
@@ -18,40 +35,56 @@
                     </select>         
 
 
-                    <input class="btn btn-outline-success  " type="submit" value="ОК">
+                    <input class="btn btn-outline-success " type="submit" value="ОК">
 
                 </form>
-                <a zippy="addnew" class="btn btn-primary  ">Добавить</a>
-                <table class="table table-bordered  table-sm  ">
-                    <tr>
-                        Номер, название, Ед.изм, резерв, цена поставщика, цена реализации, штрихкод
-                        артикул, группа, ид, класс скидки товаров, спец цена
-
-                        <th>Наименование</th>
-
-                        <th>Артикул</th>
-                        <th>Категория</th>
-                        <th>Ед.</th>
-                        <th class="text-right">Наличие</th>
-                        <th class="text-right">Отп. цена</th>
-
-
-                        <th style="width:56px"></th>
-                    </tr>
-                    <tr zippy="itemlist">
-                        <td zippy="itemname"></td>
-
-                        <td zippy="code"></td>
-                        <td zippy="cat_name"></td>
-                        <td zippy="msr"></td>
-                        <td zippy="qty" class="text-right"></td>
-                        <td zippy="price"  class="text-right"></td>
-
-
-                        <td aling="center"><a zippy="edit" title="Редактировать"><i class="fa fa-edit"></i></a> <a
-                                zippy="delete" title="Удалить"><i class="fa fa-trash"></i></a></td>
-                    </tr>
-                </table>
+                <a zippy="addnew" class="btn btn-primary ">Добавить</a>
+                <div class="row">
+                    <div class="col-4 tree">
+                        <ul zippy="cat_tree"></ul>
+                    </div>
+                    <div class="col-8">
+                        <table class="table table-bordered table-sm ">
+                            <thead>
+                                <tr>
+                                   <!--  Номер, название, Ед.изм, резерв, цена поставщика, цена реализации, штрихкод
+                                    артикул, ид, класс скидки товаров, спец цена -->
+                                    <th>Номер</th>
+                                    <th>Наименование</th>
+                                    <th>Ед. изм</th>
+                                    <th>Резерв</th>
+                                    <th>Цена поставщика</th>
+                                    <th>Цена реализации</th>
+                                    <th>Штрихкод</th>
+                                    <th>Артикул</th>
+                                    <th class="text-right">Наличие</th>
+                                    <th class="text-right">Отп. цена</th>
+                                    <th style="width:106px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr zippy="itemlist">
+                                    <td zippy="item_code"></td>
+                                    <td zippy="item_name"></td>
+                                    <td zippy="msr"></td>
+                                    <td zippy="qty" class="text-right"></td>
+                                    <td zippy="price"  class="text-right"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td aling="center">
+                                        <a zippy="edit" title="Редактировать"><i class="fa fa-edit"></i></a>
+                                        <a zippy="delete" title="Удалить"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+                
                 <div zippy="pag"></div>
             </div>
 
@@ -89,7 +122,7 @@
 
 
                     <div class="form-group row">
-                        <label class="col-5 col-form-label" for="editcode">Код товара (артикул)</label>
+                        <label class="col-5 col-form-label" for="editcode">Номенклатурный №</label>
                         <div class="col-7"> 
                             <input class="form-control" zippy="editcode"/>
                         </div>
