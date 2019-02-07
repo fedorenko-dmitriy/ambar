@@ -3,78 +3,137 @@
     </head>
 
     <body>
+        <script>
+            $(function () { 
+$.jstree.defaults.core.themes.dots
+                $('.tree').jstree({ 
+                    'core' : {
+                        'data' : data,
+                        "themes" : { 
+                            "stripes" : false,
+                            "dots" : false 
+                         }
+                    }
+                }).on("changed.jstree", function(e, data){
+                    $("table.table tr." + data.node.a_attr.class.replace(/\./g, "\\.")).toggle();
+                });
+            });
+        </script>
         <div class="row">
-
-            <div class="col-12 col-md-10 col-xl-8" zippy="itemtable">
+            <div class="col-12" zippy="itemtable">
                 <h3>Справочник товаров </h3>
                 <form zippy="filter" class="form-inline">
-
-                    <label for="searchkey">Поиск</label>
+                    <label for="searchkey" class="col-form-label">Поиск</label>
                     <input class="form-control mr-sm-2" type="text" zippy="searchkey">
-                    <label for="searchcat">категория</label>
-
+                    <label for="searchcat" class="col-form-label">категория</label>
                     <select   class="form-control mr-sm-2" zippy="searchcat">
                         <option value="0">Не задана</option>
                     </select>         
-
-
-                    <input class="btn btn-outline-success  " type="submit" value="ОК">
-
+                    <input class="btn btn-outline-success " type="submit" value="ОК">
                 </form>
-                <a zippy="addnew" class="btn btn-primary  ">Добавить</a>
-                <table class="table table-bordered  table-sm  ">
-                    <tr>
-                        Номер, название, Ед.изм, резерв, цена поставщика, цена реализации, штрихкод
-                        артикул, группа, ид, класс скидки товаров, спец цена
-
-                        <th>Наименование</th>
-
-                        <th>Артикул</th>
-                        <th>Категория</th>
-                        <th>Ед.</th>
-                        <th class="text-right">Наличие</th>
-                        <th class="text-right">Отп. цена</th>
-
-
-                        <th style="width:56px"></th>
-                    </tr>
-                    <tr zippy="itemlist">
-                        <td zippy="itemname"></td>
-
-                        <td zippy="code"></td>
-                        <td zippy="cat_name"></td>
-                        <td zippy="msr"></td>
-                        <td zippy="qty" class="text-right"></td>
-                        <td zippy="price"  class="text-right"></td>
-
-
-                        <td aling="center"><a zippy="edit" title="Редактировать"><i class="fa fa-edit"></i></a> <a
-                                zippy="delete" title="Удалить"><i class="fa fa-trash"></i></a></td>
-                    </tr>
-                </table>
+                <a zippy="addnew" class="btn btn-primary ">Добавить</a>
+                <div class="row reference">
+                    <div class="col-3 tree">
+                        <ul zippy="cat_tree"></ul>
+                    </div>
+                    <div class="col-9">
+                        <table class="table table-bordered table-sm ">
+                            <thead>
+                                <tr>
+                                   <!--  Номер, название, Ед.изм, резерв, цена поставщика, цена реализации, штрихкод
+                                    артикул, ид, класс скидки товаров, спец цена -->
+                                    <th>Номер</th>
+                                    <th>Наименование</th>
+                                    <th>Ед. изм</th>
+                                    <!-- <th>Резерв</th> -->
+                                    <th>Цена поставщика</th>
+                                    <th>Цена реализации</th>
+                                    <th>Штрихкод</th>
+                                    <th>Артикул</th>
+                                    <th class="text-right">Наличие</th>
+                                    <th class="text-right">Отп. цена</th>
+                                    <th style="width:106px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr zippy="itemlist">
+                                    <td zippy="item_code"></td>
+                                    <td zippy="item_name"></td>
+                                    <td zippy="msr"></td>
+                                    <td zippy="qty" class="text-right"></td>
+                                    <td zippy="price"  class="text-right"></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <!-- <td></td> -->
+                                    <td aling="center">
+                                        <a zippy="edit" title="Редактировать"><i class="fa fa-edit"></i></a>
+                                        <a zippy="delete" title="Удалить"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+                
                 <div zippy="pag"></div>
             </div>
 
 
 
-            <div class="col-12 col-md-6 col-xl-4"  >
+            <div class="col-12"  >
                 <form   zippy="itemdetail"  >
                     <h4>Редактирование товара </h4>
-                    <div class="form-group row">
-                        <label class="col-5 col-form-label" for="editname">Наименование</label>
-                        <div class="col-7"> 
-                            <input required="required" class="form-control" zippy="editname"/>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label" for="editname">Наименование</label>
+                                <div class="col-7"> 
+                                    <input required="required" class="form-control" zippy="editname"/>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-5 col-form-label" for="editcat">Категория</label>
+                                <div class="col-7"> 
+                                    <select   class="form-control" zippy="editcat">
+                                        <option value="0">Не задана</option>
+                                    </select>
+                                </div>
+                            </div>
+                             <div class="form-group row">
+                                <label class="col-5 col-form-label" for="editmsr">Ед. измерения</label>
+                                <div class="col-7"> 
+                                    <select  class="form-control" zippy="editmsr"></select>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-5 col-form-label" for="editcat">Категория</label>
-                        <div class="col-7"> 
-                            <select   class="form-control" zippy="editcat">
-                                <option value="0">Не задана</option>
-                            </select>
-                        </div>
-                    </div>
 
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label" for="editcode">Номенклатурный №</label>
+                                    <div class="col-7"> 
+                                        <input class="form-control" zippy="editcode" placeholder="в формате 001.0001" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label" for="editbarcode">Штрих-код</label>
+                                    <div class="col-7"> 
+                                        <input class="form-control" zippy="editbarcode"/>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-5 col-form-label" for="edit_vendor_code">Артикул</label>
+                                    <div class="col-7"> 
+                                        <input class="form-control" zippy=""/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                   
+                    </div>
+<hr />
                     <div class="form-group row">
                         <label class="col-5 col-form-label" for="editprice">Цены (наценки, %)</label>
                         <div class="col-7"> 
@@ -86,27 +145,7 @@
                             <small class="form-text text-muted">Типы цен задаются в настройках. Для наценок указать '%' после цифры</small>
                         </div>
                     </div>
-
-
-                    <div class="form-group row">
-                        <label class="col-5 col-form-label" for="editcode">Код товара (артикул)</label>
-                        <div class="col-7"> 
-                            <input class="form-control" zippy="editcode"/>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-5 col-form-label" for="editbarcode">Штрих-код</label>
-                        <div class="col-7"> 
-                            <input class="form-control" zippy="editbarcode"/>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-5 col-form-label" for="editmsr">Ед. измерения</label>
-                        <div class="col-7"> 
-                            <select  class="form-control" zippy="editmsr"></select>
-                        </div>
-                    </div>
+<hr />                   
                     <div class="form-group row">
                         <label class="col-5 col-form-label" for="editdescription">Описание</label>
                         <div class="col-7"> 
@@ -115,14 +154,13 @@
                     </div>
 
                     <div class="form-group">
-                        <input zippy="save" type="submit" value="Сохранить" class="btn btn-primary  ">&nbsp;&nbsp;
-                        <input zippy="cancel" type="button" value="Отменить" class="btn btn-light  "></td>
+                        <button zippy="save" type="submit" class="btn btn-primary  ">Сохранить</button>
+                        <buttont zippy="cancel" type="button" class="btn btn-light  ">Отменить</button>
                     </div>
-                </form>
 
+                   
+                </form>
             </div>
         </div>
-
-
     </body>
 </html>

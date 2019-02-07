@@ -34,6 +34,7 @@ class ItemList extends \App\Pages\Base
 
         $this->add(new Panel('itemtable'))->setVisible(true);
         $this->itemtable->add(new DataView('itemlist', new ItemDataSource($this), $this, 'itemlistOnRow'));
+        $this->itemtable->add(new Label('cat_tree', self::createCategoryTree()));
         $this->itemtable->add(new ClickLink('addnew'))->onClick($this, 'addOnClick');
         $this->itemtable->itemlist->setPageSize(25);
         $this->itemtable->add(new \Zippy\Html\DataList\Paginator('pag', $this->itemtable->itemlist));
@@ -95,27 +96,76 @@ class ItemList extends \App\Pages\Base
         }
     }
 
-    public function itemlistOnRow($row) {
+    public function itemlistOnRow($row) { 
         $item = $row->getDataItem();
-        $row->add(new Label('itemname', $item->itemname));
-        $row->add(new Label('code', $item->item_code));
+        $row->add(new Label('item_name', $item->itemname));
+        $row->add(new Label('item_code', $item->item_code));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id]));
-        $row->add(new Label('cat_name', $item->cat_name));
-        $plist = array();
-        if ($item->price1 > 0)
-            $plist[] = $item->price1;
-        if ($item->price2 > 0)
-            $plist[] = $item->price2;
-        if ($item->price3 > 0)
-            $plist[] = $item->price3;
-        if ($item->price4 > 0)
-            $plist[] = $item->price4;
-        if ($item->price5 > 0)
-            $plist[] = $item->price5;
+        // $plist = array();
+        // if ($item->price1 > 0)
+        //     $plist[] = $item->price1;
+        // if ($item->price2 > 0)
+        //     $plist[] = $item->price2;
+        // if ($item->price3 > 0)
+        //     $plist[] = $item->price3;
+        // if ($item->price4 > 0)
+        //     $plist[] = $item->price4;
+        // if ($item->price5 > 0)
+        //     $plist[] = $item->price5;
         $row->add(new Label('price', implode(',', $plist)));
         $row->add(new Label('qty', $item->qty));
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
         $row->add(new ClickLink('delete'))->onClick($this, 'deleteOnClick');
+
+        $codes = explode(".", $item->item_code);
+        $class = "";
+
+        foreach ($codes as $key => $value) {
+            if($key > 1){
+                $class .= " ";
+            }   
+            $class .= implode(".", array_slice($codes, 0, $key));
+        }
+
+        $row->setAttribute("class", $class);
+    }
+
+    public function createCategoryTree(){
+        $categories = Category::find();
+
+        foreach (Category::find() as $key => $value) {
+            $categories[$key] = $value;
+        }
+        // var_dump($categories);
+
+        function buildTree($elements, $parentId = 0) {
+            $branch = array();
+            $newelement = array();
+
+            foreach ($elements as $element) {            
+                $newelement["cat_id"] = $element->cat_id;
+                $newelement["cat_code"] = $element->cat_code;
+                $newelement["cat_group"] = $element->cat_group;
+                $newelement["text"] = $element->cat_name;
+                $newelement["a_attr"] = array("class"=>$element->cat_code);
+
+                if ($element->cat_group == $parentId) {
+
+                    $children = buildTree($elements, $element->cat_code);
+                    if ($children) {
+                        $newelement['children'] = $children;
+                    }
+
+                    $branch[] = $newelement;
+                }
+            }
+
+            return $branch;
+        }
+
+        $tree = buildTree($categories);
+
+        echo "<script>var data=".json_encode($tree)."</script>";
     }
 
     public function deleteOnClick($sender) {
@@ -192,6 +242,17 @@ class ItemList extends \App\Pages\Base
         $this->_item->msr_id = $this->itemdetail->editmsr->getValue();
         $this->_item->description = $this->itemdetail->editdescription->getText();
 
+
+        $cat_code = Category::findArray("cat_code")[$this->_item->cat_id];
+        $item_code = end(explode(".", $this->itemdetail->editcode->getText()));
+
+        if($cat_code){
+            $this->_item->item_code = $cat_code.".".$item_code;
+        } else {
+            $this->_item->item_code = $item_code;
+        }
+        
+
         $this->_item->Save();
 
         $this->itemtable->itemlist->Reload();
@@ -230,11 +291,42 @@ class ItemDataSource implements \Zippy\Interfaces\DataSource
     }
 
     public function getItems($start, $count, $sortfield = null, $asc = null) {
-        return Item::find($this->getWhere(), "itemname asc", $count, $start);
+        $arr = Item::find($this->getWhere(), "itemname asc", $count, $start);
+        ksort($arr);
+        // var_dump($arr);
+        return $arr;
     }
 
     public function getItem($id) {
         return Item::load($id);
     }
-
 }
+
+/*
+
+select 
+    `items`.`item_id` AS `item_id`,
+    `items`.`item_code` AS `item_code`,
+    `items`.`itemname` AS `itemname`,
+    `items`.`description` AS `description`,
+    `items`.`detail` AS `detail`,
+    `items`.`bar_code` AS `bar_code`,
+    `items`.`msr_id` AS `msr_id`,
+    `items`.`cat_id` AS `cat_id`,
+    `item_cat`.`cat_group` AS `cat_group`,
+    (select sum(`store_stock`.`qty`) from `store_stock` where (`store_stock`.`item_id` = `items`.`item_id`)) AS `qty` 
+     from (`items` left join `item_cat` on((`items`.`cat_id` = `item_cat`.`cat_id`)))
+UNION select 
+    '' AS `item_id`,
+    `item_cat`.`cat_code` AS `item_code`,
+    `item_cat`.`cat_name` AS `itemname`,
+    '' AS `description`,
+    '' AS `detail`,
+    '' AS `bar_code`,
+    '' AS `msr_id`,
+    `item_cat`.`cat_id` AS `cat_id`,
+    `item_cat`.`cat_group` AS `cat_group`,
+    '' AS `qty`
+     from `item_cat`
+
+*/
