@@ -7,7 +7,8 @@ namespace App\Entity;
  *
  * @table=items
  * @view=items_view
- * @keyfield=item_code
+ * @keyfield=item_id
+ * 
  */
 class Item extends \ZCL\DB\Entity
 {
