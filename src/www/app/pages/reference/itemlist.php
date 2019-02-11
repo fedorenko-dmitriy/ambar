@@ -155,6 +155,7 @@ class ItemList extends \App\Pages\Base
         $this->itemdetail->editcode->setText($this->_item->item_code);
         $this->itemdetail->editbarcode->setText($this->_item->bar_code);
         $this->itemdetail->editmsr->setValue($this->_item->msr_id);
+
         $this->itemdetail->editdisabled->setChecked($this->_item->disabled);
     }
 

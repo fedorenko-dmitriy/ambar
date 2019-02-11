@@ -47,7 +47,7 @@ INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `men
 INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`, `order`) VALUES(36, 4, 'Оборудование', 'EqList', '', '', 0, 0, 0);
 INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`, `order`) VALUES(37, 3, 'Закупки', 'GRList', '', '', 0, 0, 0);
 INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`, `order`) VALUES(39, 3, 'Заявки поставщикам', 'OrderCustList', '', '', 0, 0, 0);
-
+INSERT INTO `metadata` (`meta_id`, `meta_type`, `description`, `meta_name`, `menugroup`, `notes`, `disabled`, `smartmenu`) VALUES(40, 2, 'Прайс', 'Price', 'Склад', '', 0, 0);
 
 
 INSERT INTO `currencies` (`currency_id`, `currency_name`, `currency_main_name`, `currency_coin_name`, `currency_symbol`, `iso_code`, `iso_number`) VALUES(1, 'Гривна', 'грн', 'коп', '₴', 'UAH', 980);

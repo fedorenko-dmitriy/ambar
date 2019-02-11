@@ -285,12 +285,8 @@ CREATE TABLE `items` (
   `item_code` varchar(64) DEFAULT NULL,
   `bar_code` varchar(64) DEFAULT NULL,
   `cat_id` int(11) NOT NULL,
-<<<<<<< dev
   `msr_id` varchar(64) DEFAULT NULL,
-=======
-  `msr` varchar(64) DEFAULT NULL,
   `disabled` tinyint(1) DEFAULT '0',
->>>>>>> 1.1.0
   PRIMARY KEY (`item_id`),
   KEY `item_code` (`item_code`),
   KEY `itemname` (`itemname`),
@@ -681,7 +677,9 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = latin1_swedish_ci */;
 /*!50001 CREATE  */
 /*!50013  */
+
 /*!50001 VIEW `items_view` AS select `items`.`item_id` AS `item_id`,`items`.`itemname` AS `itemname`,`items`.`description` AS `description`,`items`.`detail` AS `detail`,`items`.`item_code` AS `item_code`,`items`.`bar_code` AS `bar_code`,`items`.`msr_id` AS `msr_id`,`items`.`cat_id` AS `cat_id`,`item_cat`.`cat_name` AS `cat_name`,(select sum(`store_stock`.`qty`) from `store_stock` where (`store_stock`.`item_id` = `items`.`item_id`)) AS `qty` from (`items` left join `item_cat` on((`items`.`cat_id` = `item_cat`.`cat_id`))) */;
+
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
