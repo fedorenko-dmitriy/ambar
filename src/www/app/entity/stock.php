@@ -73,7 +73,7 @@ class Stock extends \ZCL\DB\Entity
 
             $stock->save();
         }
-
+        
         return $stock;
     }
 
@@ -142,3 +142,24 @@ class Stock extends \ZCL\DB\Entity
     }
 
 }
+
+/*
+select 
+`st`.`stock_id` AS `stock_id`,
+`st`.`item_id` AS `item_id`,
+`st`.`partion` AS `partion`,
+`st`.`store_id` AS `store_id`,
+`i`.`itemname` AS `itemname`,
+`i`.`item_code` AS `item_code`,
+`i`.`cat_id` AS `cat_id`,
+`i`.`msr_id` AS `msr_id`,
+`i`.`bar_code` AS `bar_code`,
+`i`.`cat_name` AS `cat_name`,
+`stores`.`storename` AS `storename`,
+`st`.`qty` AS `qty` 
+from 
+((`store_stock` `st` join `items_view` `i` on((`i`.`item_id` = `st`.`item_id`))) join `stores` on((`stores`.`store_id` = `st`.`store_id`))) 
+
+where (`st`.`qty` <> 0)
+
+*/

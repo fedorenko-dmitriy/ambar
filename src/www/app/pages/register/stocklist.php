@@ -34,7 +34,7 @@ class StockList extends \App\Pages\Base
 
 
         $this->add(new Panel('itemtable'))->setVisible(true);
-        $this->itemtable->add(new DataView('itemlist', new ItemDataSource($this), $this, 'itemlistOnRow'));
+        $this->itemtable->add(new DataView('itemlist', new StockDataSource($this), $this, 'itemlistOnRow'));
 
         $this->itemtable->itemlist->setPageSize(25);
         $this->itemtable->add(new \Zippy\Html\DataList\Paginator('pag', $this->itemtable->itemlist));
@@ -109,7 +109,7 @@ class StockList extends \App\Pages\Base
     
 }
 
-class ItemDataSource implements \Zippy\Interfaces\DataSource
+class StockDataSource implements \Zippy\Interfaces\DataSource
 {
 
     private $page;

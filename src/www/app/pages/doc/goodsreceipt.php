@@ -37,9 +37,7 @@ class GoodsReceipt extends \App\Pages\Base
     public function __construct($docid = 0, $basedocid = 0) {
         parent::__construct();
 
-
         $common = System::getOptions("common");
-
 
         $this->add(new Form('docform'));
         $this->docform->add(new TextInput('document_number'));
@@ -168,7 +166,6 @@ class GoodsReceipt extends \App\Pages\Base
 
     public function detailOnRow($row) {
         $item = $row->getDataItem();
-
 
         $row->add(new Label('item', $item->itemname));
         $row->add(new Label('code', $item->item_code));
@@ -341,10 +338,6 @@ class GoodsReceipt extends \App\Pages\Base
                 
                 $this->_doc->updateStatus($isEdited ? Document::STATE_EDITED : Document::STATE_NEW);
             }
-            
-              
-
-
 
             if ($this->_basedocid > 0) {
                 $this->_doc->AddConnectedDoc($this->_basedocid);
@@ -423,6 +416,8 @@ class GoodsReceipt extends \App\Pages\Base
 
         $this->editnewitem->editnewitemname->setText('');
         $this->editnewitem->editnewitemcode->setText('');
+
+        var_dump(new ItemList());
     }
 
     public function savenewitemOnClick($sender) {
@@ -446,5 +441,7 @@ class GoodsReceipt extends \App\Pages\Base
         $this->editnewitem->setVisible(false);
         $this->editdetail->setVisible(true);
     }
+
+   
 
 }

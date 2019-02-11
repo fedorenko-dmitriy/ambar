@@ -263,3 +263,54 @@ body.user-login .row.justify-content-center{
     margin-right: 7px;
     margin-left: 9px;
 }
+
+
+/*Reference Item */
+
+.table{
+    font-size: 14px;
+}
+
+.reference{
+    margin-top: 10px;
+}
+
+.reference .tree{
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+}
+
+.reference .table{
+    background-color: #fff;
+}
+
+.reference table thead th:nth-child(1),
+.reference table tbody td:nth-child(1){
+    width: 15%;
+}
+
+.reference table thead th:nth-child(3),
+.reference table tbody td:nth-child(3){
+    width: 10%;
+}
+
+.reference table thead th:nth-child(4),
+.reference table tbody td:nth-child(4){
+    width: 10%;
+}
+
+
+.reference tbody {
+    display:block;
+    height:400px;
+    overflow:scroll;
+}
+.reference thead, 
+.reference tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;/* even columns width , fix width of table too*/
+}
+.reference thead {
+    width: calc( 100% - 1em ) /*scrollbar is average 1em/16px width, remove it from thead width */
+}
