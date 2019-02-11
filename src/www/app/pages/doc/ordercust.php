@@ -2,8 +2,11 @@
 
 namespace App\Pages\Doc;
 
+use \Zippy\WebApplication;
+
 use Zippy\Html\DataList\DataView;
 use Zippy\Html\Form\AutocompleteTextInput;
+use App\Html\Form\BindedTextInput;
 use Zippy\Html\Form\Button;
 use Zippy\Html\Form\CheckBox;
 use Zippy\Html\Form\Date;
@@ -11,6 +14,7 @@ use Zippy\Html\Form\DropDownChoice;
 use Zippy\Html\Form\Form;
 use Zippy\Html\Form\SubmitButton;
 use Zippy\Html\Form\TextInput;
+// use App\Html\Form\TextInput;
 use Zippy\Html\Label;
 use Zippy\Html\Link\ClickLink;
 use Zippy\Html\Link\SubmitLink;
@@ -22,7 +26,7 @@ use App\Entity\Messure;
 use App\Entity\Currency;
 use App\Helper as H;
 use App\System;
-use App\Application as App;
+use App\Application;
 
 /**
  * Страница  ввода  заявки  поставщику
@@ -41,7 +45,7 @@ class OrderCust extends \App\Pages\Base
         $this->add(new Form('docform'));
         $this->docform->add(new TextInput('document_number'));
         $this->docform->add(new Date('document_date'))->setDate(time());
-        $this->docform->add(new DropDownChoice('document_currency', Currency::findArray("currency_name")))->onChange($this, "onChangeCurrency", true);
+        $this->docform->add(new DropDownChoice('document_currency', Currency::findArray("currency_name")));
         $this->docform->add(new AutocompleteTextInput('customer'))->onText($this, 'OnAutoCustomer');
         $this->docform->add(new TextInput('notes')); 
 
@@ -56,7 +60,7 @@ class OrderCust extends \App\Pages\Base
 
         //Добавление нового товара в заказ
         $this->add(new Form('editdetail'))->setVisible(false);
-        $this->editdetail->add(new AutocompleteTextInput('edititem'))->onText($this, 'OnAutoItem');
+        $this->editdetail->add(new BindedTextInput('edititem', ".reference table"))->onText($this, 'OnAutoItem');
         $this->editdetail->add(new SubmitLink('addnewitem'))->onClick($this, 'addnewitemOnClick');
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
         $this->editdetail->add(new TextInput('editprice'));
@@ -103,23 +107,6 @@ class OrderCust extends \App\Pages\Base
             return;
     }
 
-    public function onChangeCurrency($sender) {
-        //ToDo!!!
-        // $val = $sender->getValue();
-        // $common = System::getOptions("common");
-
-        // if ($val == 1)
-        //     $this->docform->course->setText('Курс 1');
-        // if ($val == 2)
-        //     $this->docform->course->setText('Курс  ' . $common['cdoll']);
-        // if ($val == 3)
-        //     $this->docform->course->setText('Курс  ' . $common['ceuro']);
-        // if ($val == 4)
-        //     $this->docform->course->setText('Курс  ' . $common['crub']);
-
-        // $this->updateAjax(array('course'));
-    }
-
     public function detailOnRow($row) {
         $item = $row->getDataItem();
 
@@ -157,7 +144,7 @@ class OrderCust extends \App\Pages\Base
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
         $item = $sender->owner->getDataItem();
-        // unset($this->_itemlist[$item->item_id]);
+        unset($this->_itemlist[$item->item_id]);
 
         $this->_itemlist = array_diff_key($this->_itemlist, array($item->item_id => $this->_itemlist[$item->item_id]));
         $this->docform->detail->Reload();
@@ -201,7 +188,6 @@ class OrderCust extends \App\Pages\Base
         $this->editdetail->edititem->setText('');
 
         $this->editdetail->editquantity->setText("1");
-
         $this->editdetail->editprice->setText("");
     }
 
@@ -249,8 +235,6 @@ class OrderCust extends \App\Pages\Base
 
         $this->_doc->amount = $this->docform->total->getText();
         $isEdited = $this->_doc->document_id > 0;
-
-        // var_dump($this->_doc); die();
  
         $conn = \ZDB\DB::getConnect();
         $conn->BeginTrans();
@@ -361,9 +345,24 @@ class OrderCust extends \App\Pages\Base
     }
 
     public function OnAutoItem($sender) {
-
         $text = Item::qstr('%' . $sender->getText() . '%');
-        return Item::findArray('itemname', "(itemname like {$text} or item_code like {$text})");
+        $res = Item::find("(itemname like {$text} or item_code like {$text})");
+
+        $array1 = array();
+        $array2 = array();
+
+        foreach ($res as $item) { 
+            $array1["item_code"] = $item->item_code;
+            $array1["itemname"] = $item->itemname;
+            $array1["msr"] = $item->msr;
+            $array1["item_id"] = $item->item_id;
+
+            $array2[] = $array1;
+        }
+
+        // var_dump($array2); die();
+
+        return $array2;
     }
 
     public function OnAutoCustomer($sender) {
@@ -400,6 +399,17 @@ class OrderCust extends \App\Pages\Base
     public function cancelnewitemOnClick($sender) {
         $this->editnewitem->setVisible(false);
         $this->editdetail->setVisible(true);
+    }
+
+
+    public function warehouseOnRow($row) {
+        $item = $row->getDataItem();
+
+        $row->add(new Label('item', $item->itemname));
+        $row->add(new Label('code', $item->item_code));
+        $row->add(new Label('quantity', H::fqty($item->quantity)));
+        $row->add(new Label('price', $item->price));
+        $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id])); 
     }
 
 }

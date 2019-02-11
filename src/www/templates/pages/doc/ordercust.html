@@ -51,39 +51,45 @@
                 <div class="col-12">
                     <a zippy="addrow">Добавить позицию</a>
                     <table class="table table-bordered table-striped table-sm">
-                        <tr>
-                            <th>Код</th>
-                            <th>Наименование</th>
-                            <th>Ед.</th>
-                            <th>Кол.</th>
-                            <th>Цена</th>
-                            <th>Сумма</th>
-                            <th>Валюта</th>
-                            <th width="50"></th>
-                        </tr>
-                        <tr zippy="detail">
-                            <td zippy="code"></td>
-                            <td zippy="item"></td>
-                            <td zippy="msr"></td>
-                            <td zippy="quantity"></td>
-                            <td zippy="price"></td>
-                            <td zippy="amount"></td>
-                            <td zippy="currency"></td>
-                            <td>
-                                <a zippy="edit"><i class="fa fa-edit"></i></a> 
-                                <a zippy="delete"> <i class="fa fa-trash"></i></a>
-                            </td>
-                        </tr>
-                        <tr style="font-weight: bolder;">
-                            <td class="text-right"><b>Итого:</b></td>
-                            <td></td>
-                            <td class="text-right">Количество:</td>
-                            <td zippy="order_quantity"></td>
-                            <td class="text-right">Сумма:</td>
-                            <td zippy="total" class="text-right"></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>Код</th>
+                                <th>Наименование</th>
+                                <th>Ед.</th>
+                                <th>Кол.</th>
+                                <th>Цена</th>
+                                <th>Сумма</th>
+                                <th>Валюта</th>
+                                <th width="50"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr zippy="detail">
+                                <td zippy="code"></td>
+                                <td zippy="item"></td>
+                                <td zippy="msr"></td>
+                                <td zippy="quantity"></td>
+                                <td zippy="price"></td>
+                                <td zippy="amount"></td>
+                                <td zippy="currency"></td>
+                                <td>
+                                    <a zippy="edit"><i class="fa fa-edit"></i></a> 
+                                    <a zippy="delete"> <i class="fa fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                             <tr style="font-weight: bolder;">
+                                <td class="text-right"><b>Итого:</b></td>
+                                <td></td>
+                                <td class="text-right">Количество:</td>
+                                <td zippy="order_quantity"></td>
+                                <td class="text-right">Сумма:</td>
+                                <td zippy="total" class="text-right"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -128,6 +134,24 @@
                         <button type="button" zippy="cancelrow" class="btn btn-light ">Отменить</button> 
                     </div>
                 </div>
+                <div class="col-8 reference">
+                    <table class="table table-bordered table-striped table-sm ">
+                        <thead>
+                            <tr>
+                                <th>Код</th>
+                                <th>Наименование</th>
+                                <th>Ед.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr zippy="warehouse">
+                                <td zippy="code"></td>
+                                <td zippy="item"></td>
+                                <td zippy="msr"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </form>
 
@@ -135,7 +159,6 @@
             <h3>Новый товар </h3>
             <div class="row">
                 <div class="col-12 col-md-4 col-xl-3">
-
                     <div class="form-group">
                         <label for="editnewitemname">Название </label>
                         <input  class="form-control "   zippy="editnewitemname" required="required" />       

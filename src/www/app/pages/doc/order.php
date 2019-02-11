@@ -4,6 +4,7 @@ namespace App\Pages\Doc;
 
 use \Zippy\Html\DataList\DataView;
 use \Zippy\Html\Form\AutocompleteTextInput;
+use \App\Html\Form\BindedTextInput;
 use \Zippy\Html\Form\Button;
 use \Zippy\Html\Form\CheckBox;
 use \Zippy\Html\Form\Date;
@@ -59,8 +60,6 @@ class Order extends \App\Pages\Base
         $this->docform->add(new TextInput('phone'));
         $this->docform->add(new TextInput('address'))->setVisible(false);
 
-
-
         $this->docform->add(new SubmitLink('addcust'))->onClick($this, 'addcustOnClick');
 
         $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
@@ -76,10 +75,10 @@ class Order extends \App\Pages\Base
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
         $this->editdetail->add(new TextInput('editprice'));
 
-        $this->editdetail->add(new AutocompleteTextInput('edittovar'))->onText($this, 'OnAutoItem');
+        $this->editdetail->add(new BindedTextInput('edittovar', ".reference table"))->onText($this, 'OnAutoItem');
         $this->editdetail->edittovar->onChange($this, 'OnChangeItem', true);
 
-        $this->editdetail->add(new Label('qtystock'));
+        // $this->editdetail->add(new Label('qtystock'));
 
         $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelrowOnClick');
         $this->editdetail->add(new SubmitButton('submitrow'))->onClick($this, 'saverowOnClick');
@@ -136,7 +135,7 @@ class Order extends \App\Pages\Base
         $row->add(new Label('code', $item->item_code));
         $row->add(new Label('msr', $item->msr));
 
-        $row->add(new Label('quantity', H::fqty($item->quantity)));
+        // $row->add(new Label('quantity', H::fqty($item->quantity)));
         $row->add(new Label('price', $item->price));
 
         $row->add(new Label('amount', round($item->quantity * $item->price)));
@@ -331,10 +330,10 @@ class Order extends \App\Pages\Base
         $price = round($price - $price / 100 * $this->_discount);
 
 
-        $this->editdetail->qtystock->setText(Item::getQuantity($id, $this->docform->store->getValue()));
+        // $this->editdetail->qtystock->setText(Item::getQuantity($id, $this->docform->store->getValue()));
         $this->editdetail->editprice->setText($price);
 
-        $this->updateAjax(array('qtystock', 'editprice'));
+        // $this->updateAjax(array('qtystock', 'editprice'));
     }
 
     public function OnAutoCustomer($sender) {
@@ -362,8 +361,32 @@ class Order extends \App\Pages\Base
     }
 
     public function OnAutoItem($sender) {
-        $text = Item::qstr('%' . $sender->getText() . '%');
-        return Item::findArray("itemname", "  (itemname like {$text} or item_code like {$text}) ");
+        $where = "qty <> 0 ";
+
+        $store = $this->docform->store->getValue();
+        if ($store > 0) {
+            $where = $where . " and store_id=" . $store;
+        }
+
+        $text = Stock::qstr('%' . $sender->getText() . '%');
+ 
+        $res = Stock::find($where . " and (itemname like {$text} or item_code like {$text} ) ", "itemname asc");
+
+        $array1 = array();
+        $array2 = array();
+
+        foreach ($res as $item) { 
+            $array1["item_code"] = $item->item_code;
+            $array1["itemname"] = $item->itemname;
+            $array1["msr"] = $item->msr;
+            $array1["qty"] = $item->qty;
+            $array1["item_id"] = $item->item_id;
+            $array1["storename"] = $item->item_id;
+
+            $array2[] = $array1;
+        }
+
+        return $array2;
     }
 
     //добавление нового контрагента
@@ -419,5 +442,4 @@ class Order extends \App\Pages\Base
         $this->docform->detail->Reload();
         $this->calcTotal();
     }
-
 }
