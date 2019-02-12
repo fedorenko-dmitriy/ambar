@@ -32,6 +32,7 @@ class Helper
             return $user;
         if (strlen($password) > 0) {
             $b = password_verify($password, $user->userpass);
+
             return $b ? $user : false;
         }
         return false;
@@ -49,31 +50,67 @@ class Helper
     }
 
     public static function generateMenu($meta_type) {
-        $conn = \ZDB\DB::getConnect();
-        $rows = $conn->Execute("select *  from metadata where meta_type= {$meta_type} and disabled <> 1 order  by  description ");
+      $conn = \ZDB\DB::getConnect();
+        $rows = $conn->Execute("select * from metadata where meta_type= {$meta_type} and disabled <> 1 order  by  description ");
         $menu = array();
         $groups = array();
         $textmenu = "";
         $aclview = explode(',', System::getUser()->aclview);
+
         foreach ($rows as $meta_object) {
-            $meta_id = $meta_object['meta_id'];
+          $meta_id = $meta_object['meta_id'];
 
-            if (!in_array($meta_id, $aclview) && System::getUser()->acltype == 2)
-                continue;
+          if (!in_array($meta_id, $aclview) && System::getUser()->acltype == 2)
+              continue;
 
-            if (strlen($meta_object['menugroup']) == 0) {
-                $menu[$meta_id] = $meta_object;
-            } else {
-                if (!isset($groups[$meta_object['menugroup']])) {
-                    $groups[$meta_object['menugroup']] = array();
-                }
-                $groups[$meta_object['menugroup']][$meta_id] = $meta_object;
-            }
-            if ($meta_object->smart == 1) {
-                
-            }
+          if ($meta_object["meta_name"] === "divider" && $meta_object["order"] == 0)
+              continue;
+
+          if (!$meta_object["menugroup"]) {
+            array_push($menu, $meta_object);
+          } else {
+              if(strlen($meta_object["order"]) > 1){
+                $order = explode("-", $meta_object["order"]);
+              } else {
+                $order = array(intval($meta_object["order"]), 0);
+              }
+              
+              if (!$groups[$meta_object['menugroup']]) {
+                  $groups[$meta_object['menugroup']] = array();
+                  $groups[$meta_object['menugroup']]["order"] = $order[0];
+              }
+
+              $meta_object["order"] = $order[1];
+
+              array_push($groups[$meta_object['menugroup']], $meta_object);
+          }
+
         }
-        switch ($meta_type) {
+
+      $parsedData = $menu; 
+
+      foreach ($groups as $groupName => $group) {
+        $order = $group["order"];
+        unset($group["order"]);
+
+        usort($group, function ($item1, $item2) {
+          return $item1['order'] <=> $item2['order'];
+        });
+
+        array_push($parsedData, 
+          array(
+            'order' => $order, 
+            'description' => $groupName,
+            'group' => $group
+          )
+        );
+      }
+
+      usort($parsedData, function ($item1, $item2) {
+        return $item1['order'] <=> $item2['order'];
+      });
+
+      switch ($meta_type) {
             case 1 :
                 $dir = "Pages/Doc";
                 break;
@@ -90,24 +127,34 @@ class Helper
                 $dir = "Shop/Pages";
                 break;
         }
-        $textmenu = "";
 
-        foreach ($menu as $item) {
-            $textmenu .= "<li><a class=\"dropdown-item\" href=\"/?p=App/{$dir}/{$item['meta_name']}\">{$item['description']}</a></li>";
+      $html="";
+
+      foreach($parsedData as $item){
+
+        if(!$item["group"] && $item["meta_name"] != "divider"){
+          $html .= "<li><a class=\"dropdown-item\" href=\"/?p=App/{$dir}/{$item['meta_name']}\">{$item['description']}</a></li>";
+        } elseif($item["meta_name"] == "divider"){
+          $html .= "<li class='dropdown-divider'></li>";
+        } else {
+          $group = $item["group"];
+
+          if(sizeof($parsedData) > 1){
+            $html .= "<li><a class=\"dropdown-item dropdown-toggle\" href=\"#\">{$item['description']}</a>
+              <ul class=\"dropdown-menu\">";
+          }
+          foreach($group as $group_item){
+            if(isset($group_item) && isset($group_item["description"])){ 
+              $html .= "<li ><a class=\"dropdown-item\" href=\"/?p=App/{$dir}/{$group_item['meta_name']}\">{$group_item['description']}</a></li>";
+            } 
+          }
+          if(sizeof($parsedData) > 1){
+            $html .= "</ul></li>";
+          }
         }
-        foreach ($groups as $gname => $group) {
-            $textmenu .= "<li  ><a class=\"dropdown-item  dropdown-toggle\"     href=\"#\">$gname 
-             
-            </a>
-            <ul class=\"dropdown-menu\">";
+      }
 
-            foreach ($group as $item) {
-                $textmenu .= "<li ><a class=\"dropdown-item\"   href=\"/?p=App/{$dir}/{$item['meta_name']}\">{$item['description']}</a></li>";
-            }
-            $textmenu .= "</ul></li>";
-        }
-
-        return $textmenu;
+      return $html;
     }
 
     public static function generateSmartMenu() {
@@ -334,7 +381,6 @@ class Helper
     }
 
     public static function fqty($qty) {
-        if(strlen($qty)==0) return '';         
         $digit = 0;
         $common = System::getOptions("common");
         if ($common['qtydigits'] > 0) {
