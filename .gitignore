@@ -1,2 +1,5 @@
 simple-ftp-deploy.json
 src/www/vendor
+config/
+src/www/config/
+src/www/logs/
