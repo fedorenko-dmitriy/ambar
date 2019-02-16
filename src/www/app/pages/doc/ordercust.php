@@ -60,13 +60,23 @@ class OrderCust extends \App\Pages\Base
 
         //Добавление нового товара в заказ
         $this->add(new Form('editdetail'))->setVisible(false);
-        $this->editdetail->add(new BindedTextInput('edititem', ".reference table"))->onText($this, 'OnAutoItem');
-        $this->editdetail->add(new SubmitLink('addnewitem'))->onClick($this, 'addnewitemOnClick');
+        $this->editdetail->add(new AutocompleteTextInput('edititem'))->onText($this, 'OnAutoItem');
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
         $this->editdetail->add(new TextInput('editprice'));
 
+        $this->editdetail->add(new SubmitLink('addnewitem'))->onClick($this, 'addnewitemOnClick');
         $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
         $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
+
+        // //Добавление  нового товара в заказ
+        // $this->add(new Form('editdetail'))->setVisible(false);
+        // $this->editdetail->add(new BindedTextInput('edititem', ".reference table"))->onText($this, 'OnAutoItem');
+        // $this->editdetail->add(new SubmitLink('addnewitem'))->onClick($this, 'addnewitemOnClick');
+        // $this->editdetail->add(new TextInput('editquantity'))->setText("1");
+        // $this->editdetail->add(new TextInput('editprice'));
+
+        // $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
+        // $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
 
         //добавление нового товара в справочник номенклатуры
         $this->add(new Form('editnewitem'))->setVisible(false);
@@ -152,7 +162,7 @@ class OrderCust extends \App\Pages\Base
 
     public function addrowOnClick($sender) {
         $this->editdetail->setVisible(true);
-        $this->docform->setVisible(false);
+        $this->docform->setVisible(true);
         $this->_rowid = 0;
     }
 
@@ -346,24 +356,29 @@ class OrderCust extends \App\Pages\Base
 
     public function OnAutoItem($sender) {
         $text = Item::qstr('%' . $sender->getText() . '%');
-        $res = Item::find("(itemname like {$text} or item_code like {$text})");
-
-        $array1 = array();
-        $array2 = array();
-
-        foreach ($res as $item) { 
-            $array1["item_code"] = $item->item_code;
-            $array1["itemname"] = $item->itemname;
-            $array1["msr"] = $item->msr;
-            $array1["item_id"] = $item->item_id;
-
-            $array2[] = $array1;
-        }
-
-        // var_dump($array2); die();
-
-        return $array2;
+        return Item::findArray("itemname", "(itemname like {$text} or item_code like {$text} or bar_code like {$text})");
     }
+
+    // public function OnAutoItem($sender) {
+    //     $text = Item::qstr('%' . $sender->getText() . '%');
+    //     $res = Item::find("(itemname like {$text} or item_code like {$text})");
+
+    //     $array1 = array();
+    //     $array2 = array();
+
+    //     foreach ($res as $item) { 
+    //         $array1["item_code"] = $item->item_code;
+    //         $array1["itemname"] = $item->itemname;
+    //         $array1["msr"] = $item->msr;
+    //         $array1["item_id"] = $item->item_id;
+
+    //         $array2[] = $array1;
+    //     }
+
+    //     // var_dump($array2); die();
+
+    //     return $array2;
+    // }
 
     public function OnAutoCustomer($sender) {
         $text = Customer::qstr('%' . $sender->getText() . '%');
@@ -375,8 +390,8 @@ class OrderCust extends \App\Pages\Base
         $this->editnewitem->setVisible(true);
         $this->editdetail->setVisible(false);
 
-        $this->editnewitem->editnewitemname->setText('');
-        $this->editnewitem->editnewitemcode->setText('');
+        $this->editnewitem->editnewitemname->setText('11');
+        $this->editnewitem->editnewitemcode->setText('11');
     }
 
     public function savenewitemOnClick($sender) {

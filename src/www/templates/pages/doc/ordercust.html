@@ -92,7 +92,6 @@
                                 <td></td>
                             </tr>
                         </tfoot>
-
                     </table>
                 </div>
             </div>
@@ -104,12 +103,55 @@
                     <button zippy="backtolist" type="button" class="btn btn-light float-right">Отменить</
                 </div>
             </div>
-
-
         </form>
 
-
         <form zippy="editdetail">
+            <div class="modal fade show" tabindex="-1" style="display: block;" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Ввод товара</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('cancelrow').click()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="edititem">Название</label>
+                                        <input placeholder="Начните вводить..." class="form-control " zippy="edititem" />
+                                        <a style="font-size:smaller" zippy="addnewitem">Добавить новый</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="editquantity">Количество</label>
+                                        <input autocomplete="off" class="form-control" type="text" zippy="editquantity" required="required" pattern="[0-9\.]+" />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="editprice">Цена закупки</label>
+                                        <input autocomplete="off" class="form-control" type="text" zippy="editprice" required="required" pattern="[0-9\.]+" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" zippy="cancelrow" class="btn btn-secondary">Отменить</button>
+                            <button type="submit" zippy="saverow" class="btn btn-primary">Сохранить</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-backdrop fade show"></div>
+            </form>
+
+
+       <!--  <form zippy="editdetail">
             <h4>Ввод товара </h4>
             <div class="row">
                 <div class="col-4">
@@ -164,7 +206,7 @@
                     </table>
                 </div>
             </div>
-        </form>
+        </form> -->
 
         <form zippy="editnewitem">
             <h3>Новый товар </h3>
