@@ -127,7 +127,7 @@ class OrderCust extends \App\Pages\Base
         $row->add(new Label('price', $item->price));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id])); 
 
-        $row->add(new Label('amount', round($item->quantity * $item->price)));
+        $row->add(new Label('amount', $item->quantity * $item->price));
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
         $row->edit->setVisible($item->old != true);
 
