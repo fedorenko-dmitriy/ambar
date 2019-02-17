@@ -347,7 +347,7 @@ class OrderCust extends \App\Pages\Base
         foreach ($this->_itemlist as $item) {
             $quantity = $quantity + $item->quantity;
         }
-        $this->docform->order_quantity->setText($quantity);
+        $this->docform->order_quantity->setText(H::fqty($quantity));
     }
 
     /**
@@ -362,7 +362,7 @@ class OrderCust extends \App\Pages\Base
             $item->amount = $item->price * $item->quantity;
             $total = $total + $item->amount;
         }
-        $this->docform->total->setText($total);
+        $this->docform->total->setText(H::mfqty($total));
     }
 
     /**
