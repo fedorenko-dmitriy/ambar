@@ -58,9 +58,9 @@
                             <tr>
                                 <th>Код</th>
                                 <th>Наименование</th>
-                                <th>Ед.</th>
-                                <th>Кол.</th>
-                                <th>Цена</th>
+                                <th>Ед.изм.</th>
+                                <th>Кол-во</th>
+                                <th>Цена закупки</th>
                                 <th>Сумма</th>
                                 <th width="50"></th>
                             </tr>
@@ -153,21 +153,9 @@
             <div class="form-group">
                 <label for="edititem">Название</label>
                 <input placeholder="Начните вводить..." class="form-control " zippy="addItem" />
-                <!-- <a style="font-size:smaller" zippy="addnewitem">Добавить новый</a> -->
             </div>
             <div class="row">
                 <div class="col-4 selectedItems">
- <!--                    <div class="row" style="display: none;">
-                        <div class="form-group col-6">
-                            <label for="editquantity">Количество</label>
-                            <input autocomplete="off" class="form-control" type="text" required="required" pattern="[0-9\.]+" />
-                        </div>
-                        <div class="col-6 form-group">
-                            <label for="editprice">Цена</label>
-                            <input autocomplete="off" class="form-control" type="text" required="required" pattern="[0-9\.]+" />
-                        </div>
-                    </div>
- -->
                     <div class="row">
                         <div class="col-12 form-group">
                             <button type="submit" zippy="saveAddedItems" class="btn btn-outline-primary">Сохранить</button> 
@@ -181,7 +169,7 @@
                             <tr>
                                 <th>Код</th>
                                 <th>Наименование</th>
-                                <th>Ед.</th>
+                                <th>Ед.изм.</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -190,7 +190,6 @@ class OrderCust extends \App\Pages\Base
 
         $item->quantity = $this->editdetail->editquantity->getText();
         $item->price = $this->editdetail->editprice->getText();
-        $item->msr_id =  $id;
 
         unset($this->_itemlist[$this->_rowid]);
         $this->_itemlist[$item->item_id] = $item;
