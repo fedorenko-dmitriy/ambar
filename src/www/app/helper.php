@@ -393,4 +393,16 @@ class Helper
         }
     }
 
+    public static function mfqty($qty) {
+        $digit = 0;
+        $common = System::getOptions("common");
+        if ($common['moneyQtyDigits'] > 0) {
+            $digit = $common['moneyQtyDigits'];
+        }
+        if ($digit == 0) {
+            return round($qty);
+        } else {
+            return number_format($qty, $digit, '.', '');
+        }
+    }
 }

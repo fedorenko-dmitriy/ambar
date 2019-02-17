@@ -33,8 +33,7 @@ class Options extends \App\Pages\Base
         $this->common->add(new TextInput('firmname'));
         $this->common->add(new DropDownChoice('defstore', \App\Entity\Store::getList()));
         $this->common->add(new DropDownChoice('qtydigits'));
-
-
+        $this->common->add(new DropDownChoice('moneyQtyDigits'));
 
         $this->common->add(new CheckBox('useval'))->onChange($this, "onVal");
         $this->common->add(new TextInput('cdoll'));
@@ -53,8 +52,6 @@ class Options extends \App\Pages\Base
         $this->shop->add(new DropDownChoice('shopdefcust', \App\Entity\Customer::getList()));
         $this->shop->add(new DropDownChoice('shopdefpricetype', \App\Entity\Item::getPriceTypeList()));
 
-
-
         $common = System::getOptions("common");
         if (!is_array($common))
             $common = array();
@@ -62,6 +59,7 @@ class Options extends \App\Pages\Base
         $this->common->firmname->setText($common['firmname']);
         $this->common->defstore->setValue($common['defstore']);
         $this->common->qtydigits->setValue($common['qtydigits']);
+        $this->common->moneyQtyDigits->setValue($common['moneyQtyDigits']);
         $this->common->cdoll->setText($common['cdoll']);
         $this->common->ceuro->setText($common['ceuro']);
         $this->common->crub->setText($common['crub']);
@@ -129,7 +127,8 @@ class Options extends \App\Pages\Base
         $common = array();
         $common['firmname'] = $this->common->firmname->getText();
         $common['defstore'] = $this->common->defstore->getValue();
-        $common['qtydigits'] = $this->common->qtydigits->getValue();
+        $common['qtydigits'] = $this->common->qtydigits->getValue(); 
+        $common['moneyQtyDigits'] = $this->common->moneyQtyDigits->getValue();
         $common['cdoll'] = $this->common->cdoll->getText();
         $common['ceuro'] = $this->common->ceuro->getText();
         $common['crub'] = $this->common->crub->getText();
