@@ -26,7 +26,7 @@ use App\Entity\Messure;
 use App\Entity\Currency;
 use App\Helper as H;
 use App\System;
-use App\Application;
+use App\Application as App;
 
 /**
  * Страница  ввода  заявки  поставщику
@@ -50,6 +50,8 @@ class OrderCust extends \App\Pages\Base
         $this->docform->add(new TextInput('notes')); 
 
         $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
+        $this->docform->add(new SubmitLink('addrows'))->onClick($this, 'addRowsOnClick');
+        
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
         $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'savedocOnClick');
         $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
@@ -68,15 +70,15 @@ class OrderCust extends \App\Pages\Base
         $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
         $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
 
-        // //Добавление  нового товара в заказ
-        // $this->add(new Form('editdetail'))->setVisible(false);
-        // $this->editdetail->add(new BindedTextInput('edititem', ".reference table"))->onText($this, 'OnAutoItem');
-        // $this->editdetail->add(new SubmitLink('addnewitem'))->onClick($this, 'addnewitemOnClick');
-        // $this->editdetail->add(new TextInput('editquantity'))->setText("1");
-        // $this->editdetail->add(new TextInput('editprice'));
+        // Массовое добавление  товаров в заказ 
+        $this->add(new Form('additems'))->setVisible(false);
+        $this->additems->add(new BindedTextInput('addItem', ".reference table"))->onText($this, 'OnAutoItem2');
+        // $this->additems->add(new SubmitLink('addnewitem'))->onClick($this, 'addnewitemOnClick');
+        // $this->additems->add(new TextInput('addItemQuantity'))->setText("1");
+        // $this->additems->add(new TextInput('addItemPrice'));
 
-        // $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
-        // $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
+        $this->additems->add(new Button('cancelAddItems'))->onClick($this, 'cancelAddItemsOnClick');
+        $this->additems->add(new SubmitButton('saveAddedItems'))->onClick($this, 'saveAddedItemsOnClick');
 
         //добавление нового товара в справочник номенклатуры
         $this->add(new Form('editnewitem'))->setVisible(false);
@@ -93,7 +95,6 @@ class OrderCust extends \App\Pages\Base
             $this->docform->document_date->setDate($this->_doc->document_date);
             $this->docform->customer->setKey($this->_doc->customer_id);
             $this->docform->customer->setText($this->_doc->customer_name);
-            $this->docform->document_currency->setValue($this->_doc->headerdata["currency_id"]);
 
             foreach ($this->_doc->detaildata as $item) {         
                 $item = new Item($item);
@@ -125,7 +126,6 @@ class OrderCust extends \App\Pages\Base
         $row->add(new Label('quantity', H::fqty($item->quantity)));
         $row->add(new Label('price', $item->price));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id])); 
-        $row->add(new Label('currency', Currency::findArray("iso_code")[$item->currency_id]));
 
         $row->add(new Label('amount', round($item->quantity * $item->price)));
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
@@ -164,6 +164,11 @@ class OrderCust extends \App\Pages\Base
         $this->editdetail->setVisible(true);
         $this->docform->setVisible(true);
         $this->_rowid = 0;
+    }
+
+    public function addRowsOnClick($sender) {
+        $this->additems->setVisible(true);
+        $this->docform->setVisible(false);
     }
 
     public function saveRowOnClick($sender) {
@@ -206,9 +211,44 @@ class OrderCust extends \App\Pages\Base
         $this->docform->setVisible(true);
     }
 
+    public function cancelAddItemsOnClick(){
+        $this->additems->setVisible(false);
+        $this->docform->setVisible(true);
+    }
+
+    public function saveAddedItemsOnClick(){
+        $value = $this->additems->addItem->getKey();
+        $arr = explode("||", $value);
+        if (count($arr) == 0) { //ToDO сделать вывод ошибки
+            $this->setError("Не выбран товар");
+            return;
+        }
+
+        foreach ($arr as $key => $item) {
+            $arr2 = explode("_", $item);
+            $item_code = $arr2[0];
+            $quantity = $arr2[1]; 
+            $price = $arr2[2];
+
+            $item = Item::findOne("item_code='".$item_code."'");
+            $item->quantity = $quantity;
+            $item->price = $price;
+
+            unset($this->_itemlist[$this->_rowid]);
+            $this->_itemlist[$item->item_id] = $item;            
+        }
+
+        $this->additems->addItem->clean();
+        $this->additems->setVisible(false);
+        $this->docform->setVisible(true);
+        $this->docform->detail->Reload();
+    }
+
     public function savedocOnClick($sender) {
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
+
+
         $this->_doc->document_number = $this->docform->document_number->getText();
         $this->_doc->document_date = $this->docform->document_date->getDate();
         $this->_doc->currency_id = $this->docform->document_currency->getValue();
@@ -252,7 +292,7 @@ class OrderCust extends \App\Pages\Base
             
             $this->_doc->save();
 
-            
+           
             if ($sender->id == 'execdoc') {
                 if (!$isEdited)
                     $this->_doc->updateStatus(Document::STATE_NEW);
@@ -268,7 +308,7 @@ class OrderCust extends \App\Pages\Base
                 $this->_doc->updateStatus($isEdited ? Document::STATE_EDITED : Document::STATE_NEW);
             }
 
-
+ 
 
             if ($this->_basedocid > 0) {
                 $this->_doc->AddConnectedDoc($this->_basedocid);
@@ -277,13 +317,14 @@ class OrderCust extends \App\Pages\Base
 
             $conn->CommitTrans();
 
-
-            if ($isEdited)
+            if ($isEdited){          
                 App::RedirectBack();
-            else
+            } 
+            else{
                 App::Redirect("\\App\\Pages\\Register\\OrderCustList");
+            }
                
-            
+           
         } catch (\Exception $ee) {
             global $logger;
             $conn->RollbackTrans();
@@ -292,6 +333,7 @@ class OrderCust extends \App\Pages\Base
 
             return;
         }
+
         App::RedirectBack();
     }
 
@@ -359,26 +401,26 @@ class OrderCust extends \App\Pages\Base
         return Item::findArray("itemname", "(itemname like {$text} or item_code like {$text} or bar_code like {$text})");
     }
 
-    // public function OnAutoItem($sender) {
-    //     $text = Item::qstr('%' . $sender->getText() . '%');
-    //     $res = Item::find("(itemname like {$text} or item_code like {$text})");
+    public function OnAutoItem2($sender) {
+        $text = Item::qstr('%' . $sender->getText() . '%');
+        $res = Item::find("(itemname like {$text} or item_code like {$text})");
 
-    //     $array1 = array();
-    //     $array2 = array();
+        $array1 = array();
+        $array2 = array();
 
-    //     foreach ($res as $item) { 
-    //         $array1["item_code"] = $item->item_code;
-    //         $array1["itemname"] = $item->itemname;
-    //         $array1["msr"] = $item->msr;
-    //         $array1["item_id"] = $item->item_id;
+        foreach ($res as $item) { 
+            $array1["item_code"] = $item->item_code;
+            $array1["itemname"] = $item->itemname;
+            $array1["msr"] = $item->msr;
+            $array1["item_id"] = $item->item_id;
 
-    //         $array2[] = $array1;
-    //     }
+            $array2[] = $array1;
+        }
 
-    //     // var_dump($array2); die();
+        // var_dump($array2); die();
 
-    //     return $array2;
-    // }
+        return $array2;
+    }
 
     public function OnAutoCustomer($sender) {
         $text = Customer::qstr('%' . $sender->getText() . '%');
@@ -390,8 +432,8 @@ class OrderCust extends \App\Pages\Base
         $this->editnewitem->setVisible(true);
         $this->editdetail->setVisible(false);
 
-        $this->editnewitem->editnewitemname->setText('11');
-        $this->editnewitem->editnewitemcode->setText('11');
+        $this->editnewitem->editnewitemname->setText('');
+        $this->editnewitem->editnewitemcode->setText('');
     }
 
     public function savenewitemOnClick($sender) {

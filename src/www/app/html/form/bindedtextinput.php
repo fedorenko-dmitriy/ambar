@@ -81,12 +81,29 @@ class BindedTextInput extends TextInput implements Requestable
               $.each(data, function(key, row){
                 
                 var tr = $('<tr>').on('click', function(event){
-                  var id = $(event.target).closest('tr').find('td:first').text();
-                  var text = $(event.target).closest('tr').find('td').eq(1).text();
-
-                  $('#{$this->id}').val(text);
-                  $('#{$this->id}_id').val(id);
+                    var id = $(event.target).closest('tr').find('td:first').text();
+                    var text = $(event.target).closest('tr').find('td').eq(1).text();
+                    
+                    if($('.selectedItems #item_'+id.replace(/\./g, '\\\\\\\\\\\.')).length == 0){
+                        $('.selectedItems').append(
+                            '<div class=\"item\" id=\"item_'+ id.replace(/\./g, \"\\\\\.\") +'\">' +
+                                '<div>'+text+'</div>' +
+                                '<div class=\"row\">' +
+                                    '<div class=\"form-group col-6\">' +
+                                        '<label for=\"editquantity\">Количество</label>' +
+                                        '<input autocomplete=\"off\" class=\"form-control qty\" type=\"text\" required=\"required\" pattern=\"[0-9\.]+\"onchange=\"window.addItems();\"/>' +
+                                    '</div>' +
+                                    '<div class=\"col-6 form-group\">' +
+                                        '<label for=\"editprice\">Цена</label>' +
+                                        '<input autocomplete=\"off\" class=\"form-control price\" type=\"text\" required=\"required\" pattern=\"[0-9\.]+\" onchange=\"window.addItems();\" />' +
+                                    '</div>' +
+                                '</div>'+
+                                '<input type=\"hidden\" class=\"item_code\" value=\"'+id+'\"/>'+
+                            '</div>'
+                        );
+                    }
                 });
+
                 var td = '';
                 if(row.item_code) td = td + '<td>'+row.item_code+'</td>'; 
                 if(row.itemname) td = td + '<td>'+row.itemname+'</td>';
@@ -101,12 +118,31 @@ class BindedTextInput extends TextInput implements Requestable
           });
         });
 
+        window.addItems = function(){
+            var value = '';
+            $('.selectedItems').children().each(function(key, group){
+                var item_code = $(group).find('input.item_code').val();
+                var qty = $(group).find('input.qty').val();
+                var price = $(group).find('input.price').val();
+
+                if(item_code){
+                    if(key>0 && value) {
+                        value = value + '||';
+                    }
+                    value = value+item_code+'_'+qty+'_'+price; 
+
+                }
+            });
+            $(\"#{$this->id}_id\").val(value);
+            console.log(value);
+        }
+        
         $('#{$this->id}').after('<input type=\"hidden\" id=\"{$this->id}_id\" name=\"{$this->id}_id\"  value=\"{$this->key}\"/>');
 
-                  ";
+        ";
+
         //  $this->setAttribute("data-key", $this->key);
         $this->setAttribute("autocomplete", 'off');
-
 
         WebApplication::$app->getResponse()->addJavaScript($js, true);
     }

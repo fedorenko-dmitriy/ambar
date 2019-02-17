@@ -52,6 +52,7 @@
             <div class="row">
                 <div class="col-10">
                     <a zippy="addrow">Добавить позицию</a>
+                    <a zippy="addrows">Массовый ввод</a>
                     <table class="table table-bordered table-striped table-sm">
                         <thead>
                             <tr>
@@ -61,7 +62,6 @@
                                 <th>Кол.</th>
                                 <th>Цена</th>
                                 <th>Сумма</th>
-                                <th>Валюта</th>
                                 <th width="50"></th>
                             </tr>
                         </thead>
@@ -73,7 +73,6 @@
                                 <td zippy="quantity"></td>
                                 <td zippy="price"></td>
                                 <td zippy="amount"></td>
-                                <td zippy="currency"></td>
                                 <td>
                                     <a zippy="edit"><i class="fa fa-edit"></i></a> 
                                     <a zippy="delete"> <i class="fa fa-trash"></i></a>
@@ -88,7 +87,6 @@
                                 <td zippy="order_quantity"></td>
                                 <td class="text-right">Сумма:</td>
                                 <td zippy="total" class="text-right"></td>
-                                <td></td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -150,42 +148,32 @@
                 <div class="modal-backdrop fade show"></div>
             </form>
 
-
-       <!--  <form zippy="editdetail">
+        <form zippy="additems"> 
             <h4>Ввод товара </h4>
+            <div class="form-group">
+                <label for="edititem">Название</label>
+                <input placeholder="Начните вводить..." class="form-control " zippy="addItem" />
+                <!-- <a style="font-size:smaller" zippy="addnewitem">Добавить новый</a> -->
+            </div>
             <div class="row">
-                <div class="col-4">
-                    <div class="form-group">
-                        <label for="edititem">Код</label>
-                        <input placeholder="Код товара" class="form-control " />
+                <div class="col-4 selectedItems">
+ <!--                    <div class="row" style="display: none;">
+                        <div class="form-group col-6">
+                            <label for="editquantity">Количество</label>
+                            <input autocomplete="off" class="form-control" type="text" required="required" pattern="[0-9\.]+" />
+                        </div>
+                        <div class="col-6 form-group">
+                            <label for="editprice">Цена</label>
+                            <input autocomplete="off" class="form-control" type="text" required="required" pattern="[0-9\.]+" />
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="edititem">Название</label>
-                        <input placeholder="Начните вводить..." class="form-control " zippy="edititem" />
-                        <a style="font-size:smaller" zippy="addnewitem">Добавить новый</a>
-
-
-
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editquantity">Количество</label>
-                        <input autocomplete="off" class="form-control" type="text" zippy="editquantity" required="required" pattern="[0-9\.]+"
-                               style="width: 100px;"></input>
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="editprice">Цена</label>
-                        <input autocomplete="off" class="form-control" type="text" zippy="editprice" required="required" pattern="[0-9\.]+" style="width: 100px;" />
-                    </div>
-
-                    <div class="form-group">
-                        <button type="submit" zippy="saverow" class="btn btn-outline-primary">Сохранить</button> 
-                        <button type="button" zippy="cancelrow" class="btn btn-light ">Отменить</button> 
-                    </div>
+ -->
+                    <div class="row">
+                        <div class="col-12 form-group">
+                            <button type="submit" zippy="saveAddedItems" class="btn btn-outline-primary">Сохранить</button> 
+                            <button type="button" zippy="cancelAddItems" class="btn btn-light ">Отменить</button> 
+                        </div>
+                    </div> 
                 </div>
                 <div class="col-8 reference">
                     <table class="table table-bordered table-striped table-sm ">
@@ -206,7 +194,7 @@
                     </table>
                 </div>
             </div>
-        </form> -->
+        </form>
 
         <form zippy="editnewitem">
             <h3>Новый товар </h3>
