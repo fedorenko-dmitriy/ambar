@@ -124,10 +124,10 @@ class OrderCust extends \App\Pages\Base
         $row->add(new Label('item', $item->itemname));
         $row->add(new Label('code', $item->item_code));
         $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', $item->price));
+        $row->add(new Label('price', H::mfqty($item->price)));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id])); 
 
-        $row->add(new Label('amount', $item->quantity * $item->price));
+        $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
         $row->edit->setVisible($item->old != true);
 
@@ -464,7 +464,7 @@ class OrderCust extends \App\Pages\Base
         $row->add(new Label('item', $item->itemname));
         $row->add(new Label('code', $item->item_code));
         $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', $item->price));
+        $row->add(new Label('price', H::mfqty($item->price)));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id])); 
     }
 

@@ -25,7 +25,7 @@ class OrderCust extends Document
                 "itemname" => $value['itemname'],
                 "itemcode" => $value['item_code'],
                 "quantity" => H::fqty($value['quantity']),
-                "price" => $value['price'],
+                "price" => H::mfqty($value['price']),
                 "msr" => $value['msr'],
                 "amount" => $value['amount'],
                 "currency" => Currency::findArray("iso_code")[$value["currency_id"]]
