@@ -73,9 +73,9 @@ class BindedTextInput extends TextInput implements Requestable
                     {$this->matcher}
                }, ";
         }
-        $js = "
+        $js = " 
 
-        $('#{$this->id}').keyup(function(){
+        $('#{$this->id}').keyup(function(){  //ToDo Вытащить CSS
           $.getJSON('{$url}&text=' + this.value, function (data) {
             $('{$this->binded} tbody tr').remove();
               $.each(data, function(key, row){
@@ -84,23 +84,35 @@ class BindedTextInput extends TextInput implements Requestable
                     var id = $(event.target).closest('tr').find('td:first').text();
                     var text = $(event.target).closest('tr').find('td').eq(1).text();
                     
-                    if($('.selectedItems #item_'+id.replace(/\./g, '\\\\\\\\\\\.')).length == 0){
+                    if($('.selectedItems #item_'+id.replace(/\./g, '-')).length == 0){
                         $('.selectedItems').append(
-                            '<div class=\"item\" id=\"item_'+ id.replace(/\./g, \"\\\\\.\") +'\">' +
-                                '<div>'+text+'</div>' +
-                                '<div class=\"row\">' +
-                                    '<div class=\"form-group col-6\">' +
-                                        '<label for=\"editquantity\">Количество</label>' +
-                                        '<input autocomplete=\"off\" class=\"form-control qty\" type=\"text\" required=\"required\" pattern=\"[0-9\.]+\"onchange=\"window.addItems();\"/>' +
+                            '<div class=\"item row\" id=\"item_'+ id.replace(/\./g, \"-\") +'\">' +
+                                '<div class=\"col-11\">'+
+                                    '<div>'+text+'</div>' +
+                                    '<div class=\"row\">' +
+                                        '<div class=\"form-group col-6\">' +
+                                            '<label for=\"editquantity\">Количество</label>' +
+                                            '<input autocomplete=\"off\" class=\"form-control qty\" type=\"text\" required=\"required\" pattern=\"[0-9\.]+\"onchange=\"window.addItems();\"/>' +
+                                        '</div>' +
+                                        '<div class=\"col-6 form-group\">' +
+                                            '<label for=\"editprice\">Цена</label>' +
+                                            '<input autocomplete=\"off\" class=\"form-control price\" type=\"text\" required=\"required\" pattern=\"[0-9\.]+\" onchange=\"window.addItems();\" />' +
+                                        '</div>' +
                                     '</div>' +
-                                    '<div class=\"col-6 form-group\">' +
-                                        '<label for=\"editprice\">Цена</label>' +
-                                        '<input autocomplete=\"off\" class=\"form-control price\" type=\"text\" required=\"required\" pattern=\"[0-9\.]+\" onchange=\"window.addItems();\" />' +
-                                    '</div>' +
-                                '</div>'+
+                                '</div>' +
+                                '<div class=\"col-1 remove\" style=\"text-align: center;\">' +
+                                    '<a>' +
+                                        '<i class=\"fa fa-trash\"></i>' +
+                                    '</a>' +    
+                                '</div>' +
                                 '<input type=\"hidden\" class=\"item_code\" value=\"'+id+'\"/>'+
                             '</div>'
                         );
+
+                        $('#item_'+ id.replace(/\./g, \"-\")+' .remove').on('click', function(){
+                            $('#item_'+ id.replace(/\./g, \"-\")).remove();
+                            window.addItems();
+                        });
                     }
                 });
 
