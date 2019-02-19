@@ -4,6 +4,7 @@ namespace App\Pages\Doc;
 
 use Zippy\Html\DataList\DataView;
 use Zippy\Html\Form\AutocompleteTextInput;
+use App\Html\Form\BindedTextInput;
 use Zippy\Html\Form\Button;
 use Zippy\Html\Form\CheckBox;
 use Zippy\Html\Form\Date;
@@ -18,6 +19,8 @@ use App\Entity\Customer;
 use App\Entity\Doc\Document;
 use App\Entity\Item;
 use App\Entity\Store;
+use App\Entity\Messure;
+use App\Entity\Currency;
 use App\Helper as H;
 use App\System;
 use App\Application as App;
@@ -49,19 +52,21 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->add(new CheckBox('planned'));
         $this->docform->add(new CheckBox('payed'));
 
-        $this->docform->add(new DropDownChoice('val', array(1 => 'Гривна', 2 => 'Доллар', 3 => 'Евро', 4 => 'Рубль')))->onChange($this, "onVal", true);
-        $this->docform->add(new Label('course', 'Курс 1'));
-        $this->docform->val->setVisible($common['useval'] == true);
-        $this->docform->course->setVisible($common['useval'] == true);
-
+        $this->docform->add(new DropDownChoice('document_currency', Currency::findArray("currency_name")))->onChange($this, "onVal", true);
+        $this->docform->add(new Label('document_currency_rate', 'Курс 1')); //ToDo
+        // $this->docform->val->setVisible($common['useval'] == true); //ToDo
+        // $this->docform->course->setVisible($common['useval'] == true); //ToDo
 
         $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
+        $this->docform->add(new SubmitLink('addrows'))->onClick($this, 'addRowsOnClick');
+
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
         $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'savedocOnClick');
         $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
         $this->docform->add(new TextInput('order'));
-
         $this->docform->add(new Label('total'));
+
+        //Добавление нового товара в заказ
         $this->add(new Form('editdetail'))->setVisible(false);
         $this->editdetail->add(new AutocompleteTextInput('edititem'))->onText($this, 'OnAutoItem');
         $this->editdetail->add(new SubmitLink('addnewitem'))->onClick($this, 'addnewitemOnClick');
@@ -71,14 +76,19 @@ class GoodsReceipt extends \App\Pages\Base
         $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelrowOnClick');
         $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saverowOnClick');
 
-        //добавление нового товара
+        // Массовое добавление  товаров в заказ //ToDo
+        $this->add(new Form('additems'))->setVisible(false);
+        $this->additems->add(new BindedTextInput('addItem', ".reference table"))->onText($this, 'OnAutoItem2');
+
+        $this->additems->add(new Button('cancelAddItems'))->onClick($this, 'cancelAddItemsOnClick');
+        $this->additems->add(new SubmitButton('saveAddedItems'))->onClick($this, 'saveAddedItemsOnClick');
+
+        //добавление нового товара в справочник номенклатуры
         $this->add(new Form('editnewitem'))->setVisible(false);
         $this->editnewitem->add(new TextInput('editnewitemname'));
         $this->editnewitem->add(new TextInput('editnewitemcode'));
         $this->editnewitem->add(new Button('cancelnewitem'))->onClick($this, 'cancelnewitemOnClick');
         $this->editnewitem->add(new SubmitButton('savenewitem'))->onClick($this, 'savenewitemOnClick');
-
-
 
         if ($docid > 0) {    //загружаем   содержимок  документа настраницу
             $this->_doc = Document::load($docid);
@@ -153,15 +163,15 @@ class GoodsReceipt extends \App\Pages\Base
         $common = System::getOptions("common");
 
         if ($val == 1)
-            $this->docform->course->setText('Курс 1');
+            $this->docform->document_currency_rate->setText('Курс 1');
         if ($val == 2)
-            $this->docform->course->setText('Курс  ' . $common['cdoll']);
+            $this->docform->document_currency_rate->setText('Курс  ' . $common['cdoll']);
         if ($val == 3)
-            $this->docform->course->setText('Курс  ' . $common['ceuro']);
+            $this->docform->document_currency_rate->setText('Курс  ' . $common['ceuro']);
         if ($val == 4)
-            $this->docform->course->setText('Курс  ' . $common['crub']);
+            $this->docform->document_currency_rate->setText('Курс  ' . $common['crub']);
 
-        $this->updateAjax(array('course'));
+        $this->updateAjax(array('document_currency_rate'));
     }
 
     public function detailOnRow($row) {
@@ -169,9 +179,10 @@ class GoodsReceipt extends \App\Pages\Base
 
         $row->add(new Label('item', $item->itemname));
         $row->add(new Label('code', $item->item_code));
+        $row->add(new Label('bar_code', $item->bar_code));
         $row->add(new Label('quantity', H::fqty($item->quantity)));
         $row->add(new Label('price', $item->price));
-        $row->add(new Label('msr', $item->msr));
+        $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id]));
 
         $row->add(new Label('amount', round($item->quantity * $item->price)));
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
@@ -207,15 +218,14 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->detail->Reload();
     }
 
+    // Добавление одной позийии
     public function addrowOnClick($sender) {
         $this->editdetail->setVisible(true);
-        $this->docform->setVisible(false);
+        $this->docform->setVisible(true);
         $this->_rowid = 0;
     }
 
     public function saverowOnClick($sender) {
-
-
         $id = $this->editdetail->edititem->getKey();
         $name = trim($this->editdetail->edititem->getText());
         if ($id == 0 && strlen($name) < 2) {
@@ -236,8 +246,6 @@ class GoodsReceipt extends \App\Pages\Base
         $item->quantity = $this->editdetail->editquantity->getText();
         $item->price = $this->editdetail->editprice->getText();
 
-
-
         unset($this->_itemlist[$this->_rowid]);
         $this->_itemlist[$item->item_id] = $item;
         $this->editdetail->setVisible(false);
@@ -256,6 +264,45 @@ class GoodsReceipt extends \App\Pages\Base
     public function cancelrowOnClick($sender) {
         $this->editdetail->setVisible(false);
         $this->docform->setVisible(true);
+    }
+
+    // Массовый ввод    
+    public function addRowsOnClick($sender) {
+        $this->additems->setVisible(true);
+        $this->docform->setVisible(false);
+    }
+
+    public function cancelAddItemsOnClick(){
+        $this->additems->setVisible(false);
+        $this->docform->setVisible(true);
+    }
+
+    public function saveAddedItemsOnClick(){
+        $value = $this->additems->addItem->getKey();
+        $arr = explode("||", $value);
+        if (count($arr) == 0) { //ToDO сделать вывод ошибки
+            $this->setError("Не выбран товар");
+            return;
+        }
+
+        foreach ($arr as $key => $item) {
+            $arr2 = explode("_", $item);
+            $item_code = $arr2[0];
+            $quantity = $arr2[1]; 
+            $price = $arr2[2];
+
+            $item = Item::findOne("item_code='".$item_code."'");
+            $item->quantity = $quantity;
+            $item->price = $price;
+
+            unset($this->_itemlist[$this->_rowid]);
+            $this->_itemlist[$item->item_id] = $item;            
+        }
+
+        $this->additems->addItem->clean();
+        $this->additems->setVisible(false);
+        $this->docform->setVisible(true);
+        $this->docform->detail->Reload();
     }
 
     public function savedocOnClick($sender) {
@@ -278,17 +325,17 @@ class GoodsReceipt extends \App\Pages\Base
             if ($common['useval'] != true)
                 continue;
 
-            if ($this->docform->val->getValue() == 2) {
+            if ($this->docform->document_currency->getValue() == 2) {
                 $item->price = round($item->price * $common['cdoll']);
                 $item->curname = 'cdoll';
                 $item->currate = $common['cdoll'];
             }
-            if ($this->docform->val->getValue() == 3) {
+            if ($this->docform->document_currency->getValue() == 3) {
                 $item->price = round($item->price * $common['ceuro']);
                 $item->curname = 'ceuro';
                 $item->currate = $common['ceuro'];
             }
-            if ($this->docform->val->getValue() == 4) {
+            if ($this->docform->document_currency->getValue() == 4) {
                 $item->price = round($item->price * $common['crub']);
                 $item->curname = 'crub';
                 $item->currate = $common['crub'];
@@ -399,9 +446,30 @@ class GoodsReceipt extends \App\Pages\Base
     }
 
     public function OnAutoItem($sender) {
-
         $text = Item::qstr('%' . $sender->getText() . '%');
-        return Item::findArray('itemname', "(itemname like {$text} or item_code like {$text}) and disabled <> 1");
+        return Item::findArray('itemname', "itemname like {$text} or item_code like {$text} or bar_code={$text}");
+        // return Item::findArray('itemname', "(itemname like {$text} or item_code like {$text} or bar_code={$text}) and disabled <> 1"); //ToDo
+    }
+
+    public function OnAutoItem2($sender) {
+        $text = Item::qstr('%' . $sender->getText() . '%');
+        $res = Item::find("(itemname like {$text} or item_code like {$text})");
+
+        $array1 = array();
+        $array2 = array();
+
+        foreach ($res as $item) { 
+            $array1["item_code"] = $item->item_code;
+            $array1["itemname"] = $item->itemname;
+            $array1["msr"] = $item->msr;
+            $array1["item_id"] = $item->item_id;
+
+            $array2[] = $array1;
+        }
+
+        // var_dump($array2); die();
+
+        return $array2;
     }
 
     public function OnAutoCustomer($sender) {
