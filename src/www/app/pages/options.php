@@ -13,6 +13,7 @@ use \Zippy\Html\Form\TextInput;
 use \Zippy\Html\Label;
 use \Zippy\Html\Link\ClickLink;
 use \Zippy\Html\Panel;
+use App\Entity\Currency;
 use App\System;
 use App\Application as App;
 
@@ -35,6 +36,7 @@ class Options extends \App\Pages\Base
         $this->common->add(new DropDownChoice('qtydigits'));
         $this->common->add(new DropDownChoice('moneyQtyDigits'));
 
+        $this->common->add(new DropDownChoice('default_currency', Currency::getList()));
         $this->common->add(new CheckBox('useval'))->onChange($this, "onVal");
         $this->common->add(new TextInput('cdoll'));
         $this->common->add(new TextInput('ceuro'));
@@ -69,9 +71,8 @@ class Options extends \App\Pages\Base
         $this->common->price4->setText($common['price4']);
         $this->common->price5->setText($common['price5']);
         $this->common->useval->setChecked($common['useval']);
+        $this->common->default_currency->setValue($common['default_currency']);
         // $this->common->closeddate->setDate($common['closeddate']);
-
-
 
 
         $this->onVal($this->common->useval);
@@ -138,6 +139,7 @@ class Options extends \App\Pages\Base
         $common['price4'] = $this->common->price4->getText();
         $common['price5'] = $this->common->price5->getText();
         $common['useval'] = $this->common->useval->isChecked();
+        $common['default_currency'] = $this->common->default_currency->getValue();
 
         // $common['closeddate'] = $this->common->closeddate->getDate();
 
