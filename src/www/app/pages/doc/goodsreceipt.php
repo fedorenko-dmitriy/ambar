@@ -64,7 +64,9 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'savedocOnClick');
         $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
         $this->docform->add(new TextInput('order'));
-        $this->docform->add(new Label('total'));
+
+        $this->docform->add(new TextInput('total_amount'));
+        $this->docform->add(new TextInput('total_quantity'));
 
         //Добавление нового товара в заказ
         $this->add(new Form('editdetail'))->setVisible(false);
@@ -144,7 +146,7 @@ class GoodsReceipt extends \App\Pages\Base
                              $item = new Item($_item);
                              $this->_itemlist[$item->item_id] = $item;
                         }
-                        $this->calcTotal(); 
+                        // $this->calcTotal();  //ToDO
                     }
                      
                 }
@@ -181,10 +183,10 @@ class GoodsReceipt extends \App\Pages\Base
         $row->add(new Label('code', $item->item_code));
         $row->add(new Label('bar_code', $item->bar_code));
         $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', $item->price));
+        $row->add(new Label('price', H::mfqty($item->price)));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id]));
 
-        $row->add(new Label('amount', round($item->quantity * $item->price)));
+        $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
         $row->edit->setVisible($item->old != true);
 
@@ -214,7 +216,8 @@ class GoodsReceipt extends \App\Pages\Base
         // unset($this->_itemlist[$item->item_id]);
 
         $this->_itemlist = array_diff_key($this->_itemlist, array($item->item_id => $this->_itemlist[$item->item_id]));
-        $this->calcTotal();
+        // $this->calcTotal(); //ToDO
+
         $this->docform->detail->Reload();
     }
 
@@ -242,7 +245,6 @@ class GoodsReceipt extends \App\Pages\Base
 
         $item = Item::load($id);
 
-
         $item->quantity = $this->editdetail->editquantity->getText();
         $item->price = $this->editdetail->editprice->getText();
 
@@ -251,13 +253,12 @@ class GoodsReceipt extends \App\Pages\Base
         $this->editdetail->setVisible(false);
         $this->docform->setVisible(true);
         $this->docform->detail->Reload();
-        $this->calcTotal();
+        // $this->calcTotal();  //ToDO
+
         //очищаем  форму
         $this->editdetail->edititem->setKey(0);
         $this->editdetail->edititem->setText('');
-
         $this->editdetail->editquantity->setText("1");
-
         $this->editdetail->editprice->setText("");
     }
 
@@ -316,7 +317,7 @@ class GoodsReceipt extends \App\Pages\Base
             return;
         }
         $old = $this->_doc->cast();
-        $this->calcTotal();
+        // $this->calcTotal();  //ToDO
 
         $common = System::getOptions("common");
         foreach ($this->_itemlist as $item) {
@@ -347,7 +348,7 @@ class GoodsReceipt extends \App\Pages\Base
             'order' => $this->docform->order->getText(),
             'store' => $this->docform->store->getValue(),
             'planned' => $this->docform->planned->isChecked() ? 1 : 0,
-            'total' => $this->docform->total->getText(),
+            'total' => $this->docform->total_amount->getText(),
             'order_id' => $this->_order_id
         );
         $this->_doc->detaildata = array();
@@ -355,7 +356,7 @@ class GoodsReceipt extends \App\Pages\Base
             $this->_doc->detaildata[] = $item->getData();
         }
 
-        $this->_doc->amount = $this->docform->total->getText();
+        $this->_doc->amount = $this->docform->total_amount->getText();
         $isEdited = $this->_doc->document_id > 0;
 
 
@@ -403,6 +404,21 @@ class GoodsReceipt extends \App\Pages\Base
         App::RedirectBack();
     }
 
+
+    /**
+     * Расчет  общего количества
+     *
+     */
+    private function calcOrderQuantity() {
+
+        $quantity = 0;
+
+        foreach ($this->_itemlist as $item) {
+            $quantity = $quantity + $item->quantity;
+        }
+        $this->docform->total_quantity->setText(H::fqty($quantity));
+    }
+
     /**
      * Расчет  итого
      *
@@ -415,7 +431,7 @@ class GoodsReceipt extends \App\Pages\Base
             $item->amount = $item->price * $item->quantity;
             $total = $total + $item->amount;
         }
-        $this->docform->total->setText($total);
+        $this->docform->total_amount->setText(H::mfqty($total));
     }
 
     /**
@@ -439,7 +455,12 @@ class GoodsReceipt extends \App\Pages\Base
         return !$this->isError();
     }
 
- 
+    public function beforeRender() {
+        parent::beforeRender();
+
+        $this->calcTotal();
+        $this->calcOrderQuantity();
+    }
 
     public function backtolistOnClick($sender) {
         App::RedirectBack();
