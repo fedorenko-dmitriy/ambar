@@ -35,7 +35,7 @@ class GoodsReceipt extends \App\Pages\Base
     private $_doc;
     private $_basedocid = 0;
     private $_rowid = 0;
-      private $_order_id = 0;
+    private $_order_id = 0;
       
     public function __construct($docid = 0, $basedocid = 0) {
         parent::__construct();
@@ -52,10 +52,10 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->add(new CheckBox('planned'));
         $this->docform->add(new CheckBox('payed'));
 
-        $this->docform->add(new DropDownChoice('document_currency', Currency::findArray("currency_name")))->onChange($this, "onVal", true);
-        $this->docform->add(new Label('document_currency_rate', 'Курс 1')); //ToDo
-        // $this->docform->val->setVisible($common['useval'] == true); //ToDo
-        // $this->docform->course->setVisible($common['useval'] == true); //ToDo
+
+        $this->docform->add(new DropDownChoice('document_currency', Currency::findArray("currency_name"), $common["default_currency"]))->onChange($this,"onChangeCurrency");
+        $this->docform->add(new TextInput('document_currency_rate'));
+        $this->docform->document_currency_rate->setAttribute("disabled","disabled");
 
         $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
         $this->docform->add(new SubmitLink('addrows'))->onClick($this, 'addRowsOnClick');
@@ -65,8 +65,13 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
         $this->docform->add(new TextInput('order'));
 
-        $this->docform->add(new TextInput('total_amount'));
-        $this->docform->add(new TextInput('total_quantity'));
+        $this->docform->add(new Label('total_amount_income'));
+        $this->docform->add(new Label('total_amount'));
+        $this->docform->add(new Label('total_quantity'));
+
+        $this->docform->document_currency->setVisible($common['useval'] == true);
+        $this->docform->document_currency_rate->setVisible($common['useval'] == true);
+        $this->docform->total_amount->setVisible($common['useval'] == true);
 
         //Добавление нового товара в заказ
         $this->add(new Form('editdetail'))->setVisible(false);
@@ -94,12 +99,15 @@ class GoodsReceipt extends \App\Pages\Base
 
         if ($docid > 0) {    //загружаем   содержимок  документа настраницу
             $this->_doc = Document::load($docid);
+
             $this->docform->document_number->setText($this->_doc->document_number);
+            $this->docform->document_date->setDate($this->_doc->document_date);
+            $this->docform->document_currency->setValue($this->_doc->headerdata['currency_id']);
+            $this->docform->document_currency_rate->setValue($this->_doc->headerdata['currency_rate']);
             $this->docform->planned->setChecked($this->_doc->headerdata['planned']);
 
             $this->docform->notes->setText($this->_doc->notes);
             $this->docform->order->setText($this->_doc->headerdata['order']);
-            $this->docform->document_date->setDate($this->_doc->document_date);
             $this->docform->customer->setKey($this->_doc->customer_id);
             $this->docform->customer->setText($this->_doc->customer_name);
 
@@ -158,35 +166,29 @@ class GoodsReceipt extends \App\Pages\Base
             return;
 
         $this->docform->payed->setChecked($this->_doc->datatag == $this->_doc->amount);
-    }
 
-    public function onVal($sender) {
-        $val = $sender->getValue();
-        $common = System::getOptions("common");
-
-        if ($val == 1)
-            $this->docform->document_currency_rate->setText('Курс 1');
-        if ($val == 2)
-            $this->docform->document_currency_rate->setText('Курс  ' . $common['cdoll']);
-        if ($val == 3)
-            $this->docform->document_currency_rate->setText('Курс  ' . $common['ceuro']);
-        if ($val == 4)
-            $this->docform->document_currency_rate->setText('Курс  ' . $common['crub']);
-
-        $this->updateAjax(array('document_currency_rate'));
+        $this->docform->document_currency->setVisible($common['useval'] == true);
+        $this->docform->document_currency_rate->setVisible($common['useval'] == true);
     }
 
     public function detailOnRow($row) {
+        $common = System::getOptions("common");
         $item = $row->getDataItem();
 
         $row->add(new Label('item', $item->itemname));
         $row->add(new Label('code', $item->item_code));
         $row->add(new Label('bar_code', $item->bar_code));
-        $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', H::mfqty($item->price)));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id]));
+        $row->add(new Label('quantity', H::fqty($item->quantity)));
 
-        $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
+        $row->add(new Label('price_income', H::mfqty($item->price_income)));
+        $row->add(new Label('amount_income', H::mfqty($item->quantity * $item->price_income)));
+
+        if($common['useval'] == true){
+            $row->add(new Label('price', H::mfqty($item->price)));
+            $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
+        }
+
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
         $row->edit->setVisible($item->old != true);
 
@@ -199,12 +201,10 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->setVisible(false);
 
         $this->editdetail->editquantity->setText($item->quantity);
-        $this->editdetail->editprice->setText($item->price);
-
+        $this->editdetail->editprice->setText($item->price_income);
 
         $this->editdetail->edititem->setKey($item->item_id);
         $this->editdetail->edititem->setText($item->itemname);
-
 
         $this->_rowid = $item->item_id;
     }
@@ -221,7 +221,7 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->detail->Reload();
     }
 
-    // Добавление одной позийии
+    // Добавление одной позиции
     public function addrowOnClick($sender) {
         $this->editdetail->setVisible(true);
         $this->docform->setVisible(true);
@@ -231,6 +231,9 @@ class GoodsReceipt extends \App\Pages\Base
     public function saverowOnClick($sender) {
         $id = $this->editdetail->edititem->getKey();
         $name = trim($this->editdetail->edititem->getText());
+        $currency_rate = $this->docform->document_currency_rate->getValue();
+        $currency_rate = empty($currency_rate) ? 1 : $currency_rate;
+
         if ($id == 0 && strlen($name) < 2) {
             $this->setError("Не выбран товар");
             return;
@@ -244,9 +247,9 @@ class GoodsReceipt extends \App\Pages\Base
         }
 
         $item = Item::load($id);
-
         $item->quantity = $this->editdetail->editquantity->getText();
-        $item->price = $this->editdetail->editprice->getText();
+        $item->price_income = $this->editdetail->editprice->getText();
+        $item->price = $item->price_income * $currency_rate;
 
         unset($this->_itemlist[$this->_rowid]);
         $this->_itemlist[$item->item_id] = $item;
@@ -280,6 +283,9 @@ class GoodsReceipt extends \App\Pages\Base
 
     public function saveAddedItemsOnClick(){
         $value = $this->additems->addItem->getKey();
+        $currency_rate = $this->docform->document_currency_rate->getValue();
+        $currency_rate = empty($currency_rate) ? 1 : $currency_rate;
+
         $arr = explode("||", $value);
         if (count($arr) == 0) { //ToDO сделать вывод ошибки
             $this->setError("Не выбран товар");
@@ -294,7 +300,8 @@ class GoodsReceipt extends \App\Pages\Base
 
             $item = Item::findOne("item_code='".$item_code."'");
             $item->quantity = $quantity;
-            $item->price = $price;
+            $item->price_income = $price;
+            $item->price = $item->price_income * $currency_rate;
 
             unset($this->_itemlist[$this->_rowid]);
             $this->_itemlist[$item->item_id] = $item;            
@@ -307,6 +314,7 @@ class GoodsReceipt extends \App\Pages\Base
     }
 
     public function savedocOnClick($sender) {
+        $common = System::getOptions("common");
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
         $this->_doc->document_number = $this->docform->document_number->getText();
@@ -317,56 +325,36 @@ class GoodsReceipt extends \App\Pages\Base
             return;
         }
         $old = $this->_doc->cast();
-        // $this->calcTotal();  //ToDO
 
-        $common = System::getOptions("common");
-        foreach ($this->_itemlist as $item) {
-            if ($item->old == true)
-                continue;
-            if ($common['useval'] != true)
-                continue;
-
-            if ($this->docform->document_currency->getValue() == 2) {
-                $item->price = round($item->price * $common['cdoll']);
-                $item->curname = 'cdoll';
-                $item->currate = $common['cdoll'];
-            }
-            if ($this->docform->document_currency->getValue() == 3) {
-                $item->price = round($item->price * $common['ceuro']);
-                $item->curname = 'ceuro';
-                $item->currate = $common['ceuro'];
-            }
-            if ($this->docform->document_currency->getValue() == 4) {
-                $item->price = round($item->price * $common['crub']);
-                $item->curname = 'crub';
-                $item->currate = $common['crub'];
-            }
-        }
-
+        $this->calcTotal();
+        $this->convertCurrency();
 
         $this->_doc->headerdata = array(
             'order' => $this->docform->order->getText(),
             'store' => $this->docform->store->getValue(),
             'planned' => $this->docform->planned->isChecked() ? 1 : 0,
             'total' => $this->docform->total_amount->getText(),
-            'order_id' => $this->_order_id
+            'order_id' => $this->_order_id,
+            'currency_id' => $this->docform->document_currency->getValue(),
+            'currency_rate' => $this->getCurrencyRate()
         );
+
         $this->_doc->detaildata = array();
         foreach ($this->_itemlist as $item) {
-            $this->_doc->detaildata[] = $item->getData();
+            $item = $item->getData();
+            $item['currency_id'] = $this->_doc->headerdata['currency_id'];
+            $item['currency_rate'] = $this->_doc->headerdata['currency_rate'];
+            $this->_doc->detaildata[] = $item;
         }
 
-        $this->_doc->amount = $this->docform->total_amount->getText();
+        $this->_doc->amount = intval($this->docform->total_amount->getText());
         $isEdited = $this->_doc->document_id > 0;
-
-
 
         if ($this->docform->payed->isChecked() == true && $this->_doc->datatag < $this->_doc->amount) {
 
             $this->_doc->addPayment(System::getUser()->user_id, $this->_doc->amount == $this->_doc->datatag);
             $this->_doc->datatag = $this->_doc->amount;
         }
-
 
         $conn = \ZDB\DB::getConnect();
         $conn->BeginTrans();
@@ -377,6 +365,8 @@ class GoodsReceipt extends \App\Pages\Base
             if ($sender->id == 'execdoc') {
                 if (!$isEdited)
                     $this->_doc->updateStatus(Document::STATE_NEW);
+
+                // var_dump($this->_doc); die();
 
                 $this->_doc->updateStatus(Document::STATE_EXECUTED);
                 if ($order instanceof Document) {
@@ -426,12 +416,41 @@ class GoodsReceipt extends \App\Pages\Base
     private function calcTotal() {
 
         $total = 0;
+        $currency_rate = $this->getCurrencyRate();
 
         foreach ($this->_itemlist as $item) {
-            $item->amount = $item->price * $item->quantity;
-            $total = $total + $item->amount;
+            $item->amount_income = $item->price_income * $item->quantity;
+            $item->amount = ($item->amount_income * $currency_rate);
+            $total = $total + $item->amount_income;
         }
-        $this->docform->total_amount->setText(H::mfqty($total));
+        $this->docform->total_amount_income->setText(H::mfqty($total));
+        $this->docform->total_amount->setText(H::mfqty($total * $this->getCurrencyRate()));
+    }
+
+    /**
+     * Конвертаця валюты
+     *
+     */
+    private function convertCurrency() {
+        $common = System::getOptions("common");
+
+        foreach ($this->_itemlist as $item) {
+            // if ($common['useval'] != true)
+            //     continue;
+
+            $item->price = $item->price_income * $this->getCurrencyRate();
+        }
+    }
+
+    private function getCurrencyRate(){
+        $currency_id = $this->docform->document_currency->getValue();
+        $currency_rate = $this->docform->document_currency_rate->getValue();
+
+        if(empty($currency_rate) || $currency_id == $common['default_currency']){
+            $currency_rate = 1;
+        }
+
+        return $currency_rate;
     }
 
     /**
@@ -498,6 +517,18 @@ class GoodsReceipt extends \App\Pages\Base
         return Customer::findArray("customer_name", "Customer_name like " . $text);
     }
 
+    public function onChangeCurrency($sender) {
+        $common = System::getOptions("common");
+        if($sender->getValue() != $common["default_currency"]){
+            $this->docform->document_currency_rate->setAttribute("disabled",null);
+        } else {
+            $this->docform->document_currency_rate->setValue("");
+            $this->docform->document_currency_rate->setAttribute("disabled", "disabled");
+        }
+
+        $this->updateAjax(array('document_currency_rate'));
+    }
+
     //добавление нового товара
     public function addnewitemOnClick($sender) {
         $this->editnewitem->setVisible(true);
@@ -534,3 +565,7 @@ class GoodsReceipt extends \App\Pages\Base
    
 
 }
+
+
+/*
+<doc><header><order></order><store>22</store><planned>0</planned><total>4.0000</total><order_id>0</order_id><currency_id>2</currency_id><currency_rate>2</currency_rate><pays><![CDATA[YToxOntpOjA7TzoxMjoiQXBwXERhdGFJdGVtIjoyOntzOjI6ImlkIjtOO3M6OToiACoAZmllbGRzIjthOjQ6e3M6NDoidXNlciI7czoxOiIxIjtzOjY6ImFtb3VudCI7YjowO3M6NzoiY29tbWVudCI7czowOiIiO3M6NDoiZGF0ZSI7aToxNTUwODc1NjU5O319fQ==]]></pays></header><detail><row><item_id>31</item_id><cat_id>0</cat_id><currency_id>2</currency_id><currency_rate>1</currency_rate><price>2</price><price_fc>2</price_fc><itemname><![CDATA[Винт установочный М2 (плоский конец), L=2mm, DIN 913, HEX]]></itemname><description></description><detail><![CDATA[<detail><price1></price1><price2></price2><price3></price3><price4></price4><price5></price5><curname></curname><currate>0</currate></detail>]]></detail><item_code><![CDATA[001.001.0073]]></item_code><bar_code></bar_code><msr_id>1</msr_id><cat_name></cat_name><qty>16</qty><price1></price1><price2></price2><price3></price3><price4></price4><price5></price5><quantity>1</quantity><amount>4</amount></row></detail> <states> <staterow><stateno></stateno><stateuser></stateuser><stateusername><![CDATA[]]></stateusername><statehost></statehost><statedt></statedt></staterow></states></doc>

@@ -24,8 +24,8 @@
                 </div>
                 <div class="col-12 col-md-3">
                      <div class="form-group">
-                        <label for="document_currency_rate">Курс валюты</label>
-                        <input class="form-control" id="document_currenc_rate" type="text" zippy="document_currency_rate" />
+                        <label data-label="document_currency_rate" for="document_currency_rate">Курс валюты</label>
+                        <input class="form-control" type="text" zippy="document_currency_rate" />
                     </div>  
                 </div>
             </div>
@@ -94,6 +94,8 @@
                             <th>Кол.</th>
                             <th>Цена прих.</th>
                             <th>Сумма</th>
+                            <th data-label="document_currency" >Цена прих.(нац.вал.)</th>
+                            <th data-label="document_currency" >Сумма(нац.вал.)</th>
                             <th>Подразделение</th>
                             <th width="50"></th>
                         </tr>
@@ -103,8 +105,10 @@
                             <td zippy="bar_code"></td>
                             <td zippy="msr"></td>
                             <td zippy="quantity" class="text-right"></td>
-                            <td zippy="price" class="text-right"></td>
-                            <td zippy="amount" class="text-right"></td>
+                            <td zippy="price_income" class="text-right"></td>
+                            <td zippy="amount_income" class="text-right"></td>
+                            <td data-label="document_currency" zippy="price" class="text-right"></td>
+                            <td data-label="document_currency" zippy="amount" class="text-right"></td>
                             <td>//ToDo warehouse</td>
                             <td>
                                 <a zippy="edit"><i class="fa fa-edit"></i></a>
@@ -112,18 +116,19 @@
                             </td>
                         </tr>
                         <tr style="font-weight: bolder;">
-                            <td colspan="3" class="text-right">
-                                <b>Итого в валюте:</b>
-                                <input readonly="readonly" class="form-control" type="text">
-                            </td>
-                            <td colspan="3" class="text-right">
-                                <b>Итого в гривне:</b>
-                                <input readonly="readonly" zippy="total_amount" class="form-control" type="text">
-                            </td>
-                            <td colspan="3" class="text-right">
+                            <td colspan="5" class="text-right">
                                 <b>Количество:</b>
-                                <input readonly="readonly" zippy="total_quantity" class="form-control" type="text">
+                                <span zippy="total_quantity"></span>
                             </td>
+                            <td colspan="2" class="text-right">
+                                <b>Итого:</b>
+                                <span zippy="total_amount_income"></span>
+                            </td>
+                            <td colspan="2" class="text-right">
+                                <b data-label="document_currency">Итого в нац.валюте:</b>
+                                <span zippy="total_amount"></span>
+                            </td>
+                            <td data-label="document_currency" colspan="2" ></td>
                         </tr>
                     </table>
                 </div>

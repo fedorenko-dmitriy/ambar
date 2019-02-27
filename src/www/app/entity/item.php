@@ -16,9 +16,10 @@ class Item extends \ZCL\DB\Entity
     protected function init() {
         $this->item_id = 0;
         $this->cat_id = 0;
-        $this->curname = '';
-        $this->currate = 0;
+        $this->currency_id = 0;
+        $this->currency_rate = 0;
         $this->price = 0;
+        $this->price_income = 0;
     }
 
     protected function afterLoad() {
@@ -26,13 +27,14 @@ class Item extends \ZCL\DB\Entity
 
         $xml = @simplexml_load_string($this->detail);
 
+        $this->price_income = (string) ($xml->price_income[0]);
         $this->price1 = (string) ($xml->price1[0]);
         $this->price2 = (string) ($xml->price2[0]);
         $this->price3 = (string) ($xml->price3[0]);
         $this->price4 = (string) ($xml->price4[0]);
         $this->price5 = (string) ($xml->price5[0]);
-        $this->curname = (string) ($xml->curname[0]);
-        $this->currate = doubleval($xml->currate[0]);
+        $this->currency_id = (string) ($xml->currency_id[0]);
+        $this->currency_rate = doubleval($xml->currency_rate[0]);
 
 
 
@@ -43,13 +45,14 @@ class Item extends \ZCL\DB\Entity
         parent::beforeSave();
         $this->detail = "<detail>";
         //упаковываем  данные в detail
+        $this->detail .= "<price_income>{$this->price_income}</price_income>";
         $this->detail .= "<price1>{$this->price1}</price1>";
         $this->detail .= "<price2>{$this->price2}</price2>";
         $this->detail .= "<price3>{$this->price3}</price3>";
         $this->detail .= "<price4>{$this->price4}</price4>";
         $this->detail .= "<price5>{$this->price5}</price5>";
-        $this->detail .= "<curname>{$this->curname}</curname>";
-        $this->detail .= "<currate>{$this->currate}</currate>";
+        $this->detail .= "<currency_id>{$this->currency_id}</currency_id>";
+        $this->detail .= "<currency_rate>{$this->currency_rate}</currency_rate>";
 
         $this->detail .= "</detail>";
 
@@ -119,21 +122,15 @@ class Item extends \ZCL\DB\Entity
 
 
         if ($common['useval'] == true) {
-            $k = 1;
-            if ($common['cdoll'] > 0 && $this->currate > 0 && $this->curname == 'cdoll') {
-                $k = $common['cdoll'] / $this->currate;
-            }
-            if ($common['ceuro'] > 0 && $this->currate > 0 && $this->curname == 'ceuro') {
-                $k = $common['ceuro'] / $this->currate;
-            }
-            if ($common['crub'] > 0 && $this->currate > 0 && $this->curname == 'crub') {
-                $k = $common['crub'] / $this->currate;
+            $currency_rate = 1;
+            if ($this->currency_rate > 0) {
+                $currency_rate = $this->currency_rate;
             }
 
-            $price = $price * $k;
+            $price = $price * $currency_rate;
         }
 
-        return round($price);
+        return $price;
     }
 
     public static function getPriceTypeList() {

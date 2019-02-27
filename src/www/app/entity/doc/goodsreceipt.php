@@ -51,22 +51,21 @@ class GoodsReceipt extends Document
         //аналитика
         foreach ($this->detaildata as $row) {
             $stock = \App\Entity\Stock::getStock($this->headerdata['store'], $row['item_id'], $row['price'], true);
-
-
-            $sc = new Entry($this->document_id, $row['amount'], $row['quantity']);
+ 
+            $sc = new Entry($this->document_id, $row['amount'], $row['quantity']); 
             $sc->setStock($stock->stock_id);
             $sc->setExtCode($row['amount']  ); //Для АВС 
             $sc->setCustomer($this->customer_id);
 
             $sc->save();
 
-
             if ($common['useval'] == true) {
                 // if($row['old']==true)continue;  //не  меняем для  предыдущих строк
                 //запоминаем курс  последней покупки
                 $it = \App\Entity\Item::load($row['item_id']);
-                $it->curname = $row['curname'];
-                $it->currate = $row['currate'];
+                $it->price_income = $row['price_income'];
+                $it->currency_id = $row['currency_id'];
+                $it->currency_rate = $row['currency_rate'];
                 $it->save();
             }
         }

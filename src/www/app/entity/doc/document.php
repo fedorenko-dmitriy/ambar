@@ -218,6 +218,7 @@ class Document extends \ZCL\DB\Entity
 
         if (trim(get_class($this), "\\") == 'App\Entity\Doc\Document') {
             //если  екземпляр  базового типа Document приводим  к  дочернему  типу
+
             $this->cast()->Execute();
         }
     }
@@ -269,6 +270,7 @@ class Document extends \ZCL\DB\Entity
         $class = "\\App\\Entity\\Doc\\" . $this->meta_name;
         $doc = new $class($this->getData());
         $doc->unpackData();
+
         return $doc;
     }
 
