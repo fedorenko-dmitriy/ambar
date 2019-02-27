@@ -38,9 +38,6 @@ class Options extends \App\Pages\Base
 
         $this->common->add(new DropDownChoice('default_currency', Currency::getList()));
         $this->common->add(new CheckBox('useval'))->onChange($this, "onVal");
-        $this->common->add(new TextInput('cdoll'));
-        $this->common->add(new TextInput('ceuro'));
-        $this->common->add(new TextInput('crub'));
         $this->common->add(new TextInput('price1'));
         $this->common->add(new TextInput('price2'));
         $this->common->add(new TextInput('price3'));
@@ -62,9 +59,6 @@ class Options extends \App\Pages\Base
         $this->common->defstore->setValue($common['defstore']);
         $this->common->qtydigits->setValue($common['qtydigits']);
         $this->common->moneyQtyDigits->setValue($common['moneyQtyDigits']);
-        $this->common->cdoll->setText($common['cdoll']);
-        $this->common->ceuro->setText($common['ceuro']);
-        $this->common->crub->setText($common['crub']);
         $this->common->price1->setText($common['price1']);
         $this->common->price2->setText($common['price2']);
         $this->common->price3->setText($common['price3']);
@@ -114,13 +108,9 @@ class Options extends \App\Pages\Base
 
     public function onVal($sender) {
         if ($sender->isChecked()) {
-            $this->common->cdoll->setVisible(true);
-            $this->common->ceuro->setVisible(true);
-            $this->common->crub->setVisible(true);
+            $this->common->default_currency->setVisible(true);
         } else {
-            $this->common->cdoll->setVisible(false);
-            $this->common->ceuro->setVisible(false);
-            $this->common->crub->setVisible(false);
+            $this->common->default_currency->setVisible(false);
         }
     }
 
@@ -130,9 +120,6 @@ class Options extends \App\Pages\Base
         $common['defstore'] = $this->common->defstore->getValue();
         $common['qtydigits'] = $this->common->qtydigits->getValue(); 
         $common['moneyQtyDigits'] = $this->common->moneyQtyDigits->getValue();
-        $common['cdoll'] = $this->common->cdoll->getText();
-        $common['ceuro'] = $this->common->ceuro->getText();
-        $common['crub'] = $this->common->crub->getText();
         $common['price1'] = $this->common->price1->getText();
         $common['price2'] = $this->common->price2->getText();
         $common['price3'] = $this->common->price3->getText();
