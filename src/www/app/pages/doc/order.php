@@ -66,12 +66,12 @@ class Order extends \App\Pages\Base
         $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'savedocOnClick');
         $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
 
-
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
-
         $this->docform->add(new Label('total'));
 
+        //Добавление нового товара в счет-фактура
         $this->add(new Form('editdetail'))->setVisible(false);
+
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
         $this->editdetail->add(new TextInput('editprice'));
 
@@ -79,7 +79,6 @@ class Order extends \App\Pages\Base
         $this->editdetail->edittovar->onChange($this, 'OnChangeItem', true);
 
         // $this->editdetail->add(new Label('qtystock'));
-
         $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelrowOnClick');
         $this->editdetail->add(new SubmitButton('submitrow'))->onClick($this, 'saverowOnClick');
 
@@ -130,15 +129,16 @@ class Order extends \App\Pages\Base
     public function detailOnRow($row) {
         $item = $row->getDataItem();
 
-        $row->add(new Label('tovar', $item->itemname));
-
         $row->add(new Label('code', $item->item_code));
+        $row->add(new Label('tovar', $item->itemname));
+        $row->add(new Label('barcode', $item->bar_code));
         $row->add(new Label('msr', $item->msr));
+        $row->add(new Label('quantity', H::fqty($item->quantity)));
+        $row->add(new Label('price_1', $item->price));
+        $row->add(new Label('amount_1', round($item->quantity * $item->price)));
+        $row->add(new Label('price_2', $item->price));
+        $row->add(new Label('amount_2', round($item->quantity * $item->price)));
 
-        // $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', $item->price));
-
-        $row->add(new Label('amount', round($item->quantity * $item->price)));
         $row->add(new ClickLink('delete'))->onClick($this, 'deleteOnClick');
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
     }

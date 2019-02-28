@@ -12,10 +12,10 @@
                         <input class="form-control" type="text" zippy="document_number" required="required">
                     </div>
                     <div class="form-group  ">
-                        <label for="customer" >Покупатель</label>
+                        <label for="customer" >Покупатель</label> <a style="font-size:smaller" zippy="addcust">Добавить нового</a>
                         <input placeholder="Начните вводить..." class="form-control "   zippy="customer" />
                         <span zippy="discount" style="display:block;font-size:smaller"></span>
-                        <a style="font-size:smaller" zippy="addcust">Добавить нового</a>
+                        
                     </div>
                     <div class="form-group  ">
                         <label for="phone"  >Телефон</label>
@@ -63,26 +63,37 @@
                 <div class="col-10">
 
                     <a zippy="addrow">Добавить товар</a>
-                    <table class="table table-sm">
+
+                    <table class="table table-bordered table-sm">
                         <thead>
                             <tr>
-                                <th>Название</th>
-                                <th>Код</th>
-                                <th>Ед.</th>
-                                <th class="text-right">Кол.</th>
-                                <th class="text-right" >Цена</th>
-                                <th class="text-right">Сумма</th>
-                                <th width="50"></th>
+                                <th rowspan="2">Код</th>
+                                <th rowspan="2">Наименование</th>
+                                <th rowspan="2">Штрихкод</th>
+                                <th rowspan="2">Ед.</th>
+                                <th rowspan="2">Кол.</th>
+                                <th colspan="2">Учетная</th>
+                                <th colspan="2">Отпускная</th> 
+                                <th rowspan="2" width="50"></th>
+                                <tr>
+                                    <th>Цена</th>
+                                    <th>Сумма</th>
+                                    <th>Цена</th>
+                                    <th>Сумма</th>
+                                </tr>
                             </tr>
                         </thead>
                         <tbody>
                             <tr zippy="detail">
-                                <td zippy="tovar"></td>
                                 <td zippy="code"></td>
+                                <td zippy="tovar"></td>
+                                <td zippy="barcode"></td>
                                 <td zippy="msr"></td>
-                                <td zippy="quantity"  class="text-right"></td>
-                                <td zippy="price"  class="text-right"></td>
-                                <td zippy="amount"  class="text-right"></td>
+                                <td zippy="quantity" class="text-right"></td>
+                                <td zippy="price_1" class="text-right"></td>
+                                <td zippy="amount_1" class="text-right"></td>
+                                <td zippy="price_2" class="text-right"></td>
+                                <td zippy="amount_2" class="text-right"></td>
                                 <td>
                                     <a zippy="edit"><i class="fa fa-edit"></i></a>
                                     <a zippy="delete"><i class="fa fa-trash"></i></a>
@@ -91,9 +102,9 @@
                         </tbody>
                         <tfoot>
                             <tr style="font-weight: bolder;">
-                                <td colspan="5"  class="text-right">Всего:</td>
-                                <td zippy="total"  class="text-right"></td>
-                                <td></td>
+                                <td colspan="5" class="text-right">Всего:</td>
+                                <td zippy="total" class="text-right"></td>
+                                <td colspan="4"></td>
                             </tr>
                         </tfoot>
                     </table>
