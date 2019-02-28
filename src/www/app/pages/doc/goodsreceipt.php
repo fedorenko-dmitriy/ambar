@@ -61,8 +61,8 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->add(new SubmitLink('addrows'))->onClick($this, 'addRowsOnClick');
 
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
-        $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'savedocOnClick');
-        $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
+        $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'saveDocOnClick');
+        $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'saveDocOnClick');
         $this->docform->add(new TextInput('order'));
 
         $this->docform->add(new Label('total_amount_income'));
@@ -99,11 +99,17 @@ class GoodsReceipt extends \App\Pages\Base
 
         if ($docid > 0) {    //загружаем   содержимок  документа настраницу
             $this->_doc = Document::load($docid);
+            $headerdata = $this->_doc->headerdata;
 
             $this->docform->document_number->setText($this->_doc->document_number);
             $this->docform->document_date->setDate($this->_doc->document_date);
-            $this->docform->document_currency->setValue($this->_doc->headerdata['currency_id']);
-            $this->docform->document_currency_rate->setValue($this->_doc->headerdata['currency_rate']);
+            $this->docform->document_currency->setValue($headerdata['currency_id']);
+            $this->docform->document_currency_rate->setValue($headerdata['currency_rate']);
+
+            if( $headerdata['currency_id'] != $common["default_currency"]){
+                $this->docform->document_currency_rate->setAttribute("disabled", null);
+            }
+
             $this->docform->planned->setChecked($this->_doc->headerdata['planned']);
 
             $this->docform->notes->setText($this->_doc->notes);
@@ -154,7 +160,6 @@ class GoodsReceipt extends \App\Pages\Base
                              $item = new Item($_item);
                              $this->_itemlist[$item->item_id] = $item;
                         }
-                        // $this->calcTotal();  //ToDO
                     }
                      
                 }
@@ -313,7 +318,7 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->detail->Reload();
     }
 
-    public function savedocOnClick($sender) {
+    public function saveDocOnClick($sender) {
         $common = System::getOptions("common");
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
@@ -435,9 +440,6 @@ class GoodsReceipt extends \App\Pages\Base
         $common = System::getOptions("common");
 
         foreach ($this->_itemlist as $item) {
-            // if ($common['useval'] != true)
-            //     continue;
-
             $item->price = $item->price_income * $this->getCurrencyRate();
         }
     }
@@ -561,11 +563,4 @@ class GoodsReceipt extends \App\Pages\Base
         $this->editnewitem->setVisible(false);
         $this->editdetail->setVisible(true);
     }
-
-   
-
 }
-
-
-/*
-<doc><header><order></order><store>22</store><planned>0</planned><total>4.0000</total><order_id>0</order_id><currency_id>2</currency_id><currency_rate>2</currency_rate><pays><![CDATA[YToxOntpOjA7TzoxMjoiQXBwXERhdGFJdGVtIjoyOntzOjI6ImlkIjtOO3M6OToiACoAZmllbGRzIjthOjQ6e3M6NDoidXNlciI7czoxOiIxIjtzOjY6ImFtb3VudCI7YjowO3M6NzoiY29tbWVudCI7czowOiIiO3M6NDoiZGF0ZSI7aToxNTUwODc1NjU5O319fQ==]]></pays></header><detail><row><item_id>31</item_id><cat_id>0</cat_id><currency_id>2</currency_id><currency_rate>1</currency_rate><price>2</price><price_fc>2</price_fc><itemname><![CDATA[Винт установочный М2 (плоский конец), L=2mm, DIN 913, HEX]]></itemname><description></description><detail><![CDATA[<detail><price1></price1><price2></price2><price3></price3><price4></price4><price5></price5><curname></curname><currate>0</currate></detail>]]></detail><item_code><![CDATA[001.001.0073]]></item_code><bar_code></bar_code><msr_id>1</msr_id><cat_name></cat_name><qty>16</qty><price1></price1><price2></price2><price3></price3><price4></price4><price5></price5><quantity>1</quantity><amount>4</amount></row></detail> <states> <staterow><stateno></stateno><stateuser></stateuser><stateusername><![CDATA[]]></stateusername><statehost></statehost><statedt></statedt></staterow></states></doc>
