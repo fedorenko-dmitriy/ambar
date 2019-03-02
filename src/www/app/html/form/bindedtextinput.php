@@ -120,7 +120,7 @@ class BindedTextInput extends TextInput implements Requestable
                 if(row.item_code) td = td + '<td>'+row.item_code+'</td>'; 
                 if(row.itemname) td = td + '<td>'+row.itemname+'</td>';
                 if(row.qty) td = td + '<td>'+row.qty+'</td>';
-                // if(row.item_code) td = td + '<td>'+row.item_code+'</td>';
+                if(row.msr) td = td + '<td>'+row.msr+'</td>';
                 // if(row.item_code) td = td + '<td>'+row.item_code+'</td>';
 
                 tr.append(td);

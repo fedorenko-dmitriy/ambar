@@ -503,7 +503,7 @@ class GoodsReceipt extends \App\Pages\Base
         foreach ($res as $item) { 
             $array1["item_code"] = $item->item_code;
             $array1["itemname"] = $item->itemname;
-            $array1["msr"] = $item->msr;
+            $array1["msr"] = Messure::findArray("messure_short_name")[$item->msr_id];
             $array1["item_id"] = $item->item_id;
 
             $array2[] = $array1;
