@@ -60,10 +60,9 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-10">
-
+                <div class="col-12">
                     <a zippy="addrow">Добавить товар</a>
-
+                    <!-- <a zippy="addrows">Массовый ввод</a> -->
                     <table class="table table-bordered table-sm">
                         <thead>
                             <tr>
@@ -119,6 +118,52 @@
             </div>
         </form>
         <form zippy="editdetail">
+            <div class="modal fade show" tabindex="-1" style="display: block;" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Ввод товара</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="document.getElementById('cancelrow').click()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="edititem">Название</label>
+                                        <input placeholder="Начните вводить..." class="form-control " zippy="edittovar" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="editquantity">Количество</label>
+                                        <input autocomplete="off" class="form-control" type="text" zippy="editquantity" required="required" pattern="[0-9\.]+" />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="editprice">Цена продажи</label>
+                                        <input autocomplete="off" class="form-control" type="text" zippy="editprice" required="required" pattern="[0-9\.]+" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" zippy="cancelrow" class="btn btn-secondary">Отменить</button>
+                            <button type="submit" zippy="saverow" class="btn btn-primary">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-backdrop fade show"></div>
+        </form>
+
+
+
+<!--         <form zippy="editdetail">
             <h4>Ввод товара </h4>
 
             <div class="row">
@@ -128,7 +173,7 @@
                         <label for="edittovar" >Название</label>
                         <input placeholder="Начните вводить..." class="form-control "   zippy="edittovar" />
 
-                        <!-- Наличие : <span zippy="qtystock"></span> -->
+                        <!-- Наличие : <span zippy="qtystock"></span> 
 
                     </div>
                     <div class="row">
@@ -169,7 +214,9 @@
                     </table>
                 </div>
             </div>
-        </form>
+        </form> -->
+
+
         <form zippy="editcust">
             <h3>Новый контрагент </h3>
             <div class="row">

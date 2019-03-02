@@ -18,6 +18,7 @@ use \Zippy\Html\Link\ClickLink;
 use \Zippy\Html\Link\SubmitLink;
 use \App\Entity\Customer;
 use \App\Entity\Doc\Document;
+use App\Entity\Messure;
 use \App\Entity\Item;
 use \App\Entity\Stock;
 use \App\Entity\Store;
@@ -62,25 +63,28 @@ class Order extends \App\Pages\Base
 
         $this->docform->add(new SubmitLink('addcust'))->onClick($this, 'addcustOnClick');
 
-        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
-        $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'savedocOnClick');
-        $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
+        
+        $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'saveDocOnClick');
+        $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'saveDocOnClick');
 
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
         $this->docform->add(new Label('total'));
 
-        //Добавление нового товара в счет-фактура
+        //Добавление нового товара в счет-фактуру
         $this->add(new Form('editdetail'))->setVisible(false);
+        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addRowOnClick');
 
+        $this->editdetail->add(new AutocompleteTextInput('edittovar'))->onText($this, 'OnAutoItem');
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
         $this->editdetail->add(new TextInput('editprice'));
 
-        $this->editdetail->add(new BindedTextInput('edittovar', ".reference table"))->onText($this, 'OnAutoItem');
         $this->editdetail->edittovar->onChange($this, 'OnChangeItem', true);
 
         // $this->editdetail->add(new Label('qtystock'));
-        $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelrowOnClick');
-        $this->editdetail->add(new SubmitButton('submitrow'))->onClick($this, 'saverowOnClick');
+        $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
+        $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
+
+        // $this->editdetail->add(new BindedTextInput('edittovar', ".reference table"))->onText($this, 'OnAutoItem');
 
         //добавление нового кантрагента
         $this->add(new Form('editcust'))->setVisible(false);
@@ -143,6 +147,20 @@ class Order extends \App\Pages\Base
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
     }
 
+    public function editOnClick($sender) {
+        $item = $sender->getOwner()->getDataItem();
+        $this->editdetail->setVisible(true);
+        $this->docform->setVisible(false);
+
+        $this->editdetail->editquantity->setText($item->quantity);
+        $this->editdetail->editprice->setText($item->price);
+
+        $this->editdetail->edittovar->setKey($item->item_id);
+        $this->editdetail->edittovar->setText($item->itemname);
+
+        $this->_rowid = $item->item_id;
+    }
+
     public function deleteOnClick($sender) {
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
@@ -154,30 +172,16 @@ class Order extends \App\Pages\Base
         $this->calcTotal();
     }
 
-    public function addrowOnClick($sender) {
+    //Добавление одного товара
+    public function addRowOnClick($sender) {
         $this->editdetail->setVisible(true);
+        $this->docform->setVisible(true);
         $this->editdetail->editquantity->setText("1");
         $this->editdetail->editprice->setText("0");
-        $this->docform->setVisible(false);
         $this->_rowid = 0;
     }
 
-    public function editOnClick($sender) {
-        $item = $sender->getOwner()->getDataItem();
-        $this->editdetail->setVisible(true);
-        $this->docform->setVisible(false);
-
-        $this->editdetail->editquantity->setText($item->quantity);
-        $this->editdetail->editprice->setText($item->price);
-
-
-        $this->editdetail->edittovar->setKey($item->item_id);
-        $this->editdetail->edittovar->setText($item->itemname);
-
-        $this->_rowid = $item->item_id;
-    }
-
-    public function saverowOnClick($sender) {
+    public function saveRowOnClick($sender) {
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
         $id = $this->editdetail->edittovar->getKey();
@@ -208,7 +212,7 @@ class Order extends \App\Pages\Base
         $this->editdetail->editprice->setText("");
     }
 
-    public function cancelrowOnClick($sender) {
+    public function cancelRowOnClick($sender) {
         $this->editdetail->setVisible(false);
         $this->docform->setVisible(true);
         //очищаем  форму
@@ -220,7 +224,7 @@ class Order extends \App\Pages\Base
         $this->editdetail->editprice->setText("");
     }
 
-    public function savedocOnClick($sender) {
+    public function saveDocOnClick($sender) {
         $this->_doc->document_number = $this->docform->document_number->getText();
         $this->_doc->document_date = strtotime($this->docform->document_date->getText());
         $this->_doc->notes = $this->docform->notes->getText();
@@ -327,10 +331,11 @@ class Order extends \App\Pages\Base
         $id = $sender->getKey();
         $item = Item::load($id);
         $price = $item->getPrice($this->docform->pricetype->getValue());
-        $price = round($price - $price / 100 * $this->_discount);
+        if($this->_discount){
+            $price = $price - $price / 100 * $this->_discount;
+        }
 
-
-        // $this->editdetail->qtystock->setText(Item::getQuantity($id, $this->docform->store->getValue()));
+        // $this->editdetail->qtystock->setText(H::fqty(Item::getQuantity($id,$this->docform->store->getValue())));
         $this->editdetail->editprice->setText($price);
 
         // $this->updateAjax(array('qtystock', 'editprice'));
@@ -361,6 +366,29 @@ class Order extends \App\Pages\Base
     }
 
     public function OnAutoItem($sender) {
+       $where = "qty <> 0 ";
+
+        $store = $this->docform->store->getValue();
+        if ($store > 0) {
+            $where = $where . " and store_id=" . $store;
+        }
+
+        $text = Stock::qstr('%' . $sender->getText() . '%');
+ 
+        $res = Stock::find($where . " and (itemname like {$text} or item_code like {$text} ) ", "itemname asc");
+
+        $array = array();
+
+        foreach ($res as $item) { 
+            $messure = Messure::findArray("messure_short_name")[Item::findOne("item_id=".$item->item_id)->msr_id];
+
+            $array[$item->item_id] = $item->itemname. " | " . $item->qty ." ". $messure;
+        }
+
+        return $array;
+    }
+
+    public function OnAutoItem2($sender) {
         $where = "qty <> 0 ";
 
         $store = $this->docform->store->getValue();
