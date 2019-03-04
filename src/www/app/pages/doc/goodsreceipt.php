@@ -83,7 +83,7 @@ class GoodsReceipt extends \App\Pages\Base
         $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelrowOnClick');
         $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saverowOnClick');
 
-        // Массовое добавление  товаров в заказ //ToDo
+        // Массовое добавление  товаров в заказ
         $this->add(new Form('additems'))->setVisible(false);
         $this->additems->add(new BindedTextInput('addItem', ".reference table"))->onText($this, 'OnAutoItem2');
 
@@ -190,6 +190,9 @@ class GoodsReceipt extends \App\Pages\Base
         $row->add(new Label('amount_income', H::mfqty($item->quantity * $item->price_income)));
 
         if($common['useval'] == true){
+            if(!isset($item->price)){
+                $item->price = $item->price_income * $this->getCurrencyRate();
+            }
             $row->add(new Label('price', H::mfqty($item->price)));
             $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
         }

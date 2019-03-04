@@ -14,7 +14,6 @@ use Zippy\Html\Form\DropDownChoice;
 use Zippy\Html\Form\Form;
 use Zippy\Html\Form\SubmitButton;
 use Zippy\Html\Form\TextInput;
-// use App\Html\Form\TextInput;
 use Zippy\Html\Label;
 use Zippy\Html\Link\ClickLink;
 use Zippy\Html\Link\SubmitLink;
@@ -60,7 +59,7 @@ class OrderCust extends \App\Pages\Base
         $this->docform->add(new Label('total'));
         $this->docform->add(new Label('order_quantity'));
 
-        //Добавление нового товара в заказ
+        //Добавление нового товара в заказ поставщику
         $this->add(new Form('editdetail'))->setVisible(false);
         $this->editdetail->add(new AutocompleteTextInput('edititem'))->onText($this, 'OnAutoItem');
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
@@ -70,12 +69,9 @@ class OrderCust extends \App\Pages\Base
         $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
         $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
 
-        // Массовое добавление  товаров в заказ 
+        // Массовое добавление  товаров в заказ поставщику
         $this->add(new Form('additems'))->setVisible(false);
         $this->additems->add(new BindedTextInput('addItem', ".reference table"))->onText($this, 'OnAutoItem2');
-        // $this->additems->add(new SubmitLink('addnewitem'))->onClick($this, 'addnewitemOnClick');
-        // $this->additems->add(new TextInput('addItemQuantity'))->setText("1");
-        // $this->additems->add(new TextInput('addItemPrice'));
 
         $this->additems->add(new Button('cancelAddItems'))->onClick($this, 'cancelAddItemsOnClick');
         $this->additems->add(new SubmitButton('saveAddedItems'))->onClick($this, 'saveAddedItemsOnClick');
@@ -124,10 +120,11 @@ class OrderCust extends \App\Pages\Base
         $row->add(new Label('item', $item->itemname));
         $row->add(new Label('code', $item->item_code));
         $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', H::mfqty($item->price)));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id])); 
 
-        $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
+        $row->add(new Label('price_income', H::mfqty($item->price_income)));
+        $row->add(new Label('amount_income', H::mfqty($item->quantity * $item->price_income)));
+
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
         $row->edit->setVisible($item->old != true);
 
@@ -140,7 +137,7 @@ class OrderCust extends \App\Pages\Base
         $this->docform->setVisible(false);
 
         $this->editdetail->editquantity->setText($item->quantity);
-        $this->editdetail->editprice->setText($item->price);
+        $this->editdetail->editprice->setText($item->price_income);
 
 
         $this->editdetail->edititem->setKey($item->item_id);
@@ -189,7 +186,7 @@ class OrderCust extends \App\Pages\Base
         $item = Item::load($id);
 
         $item->quantity = $this->editdetail->editquantity->getText();
-        $item->price = $this->editdetail->editprice->getText();
+        $item->price_income = $this->editdetail->editprice->getText();
 
         unset($this->_itemlist[$this->_rowid]);
         $this->_itemlist[$item->item_id] = $item;
@@ -231,7 +228,7 @@ class OrderCust extends \App\Pages\Base
 
             $item = Item::findOne("item_code='".$item_code."'");
             $item->quantity = $quantity;
-            $item->price = $price;
+            $item->price_income = $price;
 
             unset($this->_itemlist[$this->_rowid]);
             $this->_itemlist[$item->item_id] = $item;            
@@ -359,8 +356,8 @@ class OrderCust extends \App\Pages\Base
         $total = 0;
 
         foreach ($this->_itemlist as $item) {
-            $item->amount = $item->price * $item->quantity;
-            $total = $total + $item->amount;
+            $item->amount = $item->price_income * $item->quantity;
+            $total = $total + $item->amount_income;
         }
         $this->docform->total->setText(H::mfqty($total));
     }
@@ -453,17 +450,6 @@ class OrderCust extends \App\Pages\Base
     public function cancelnewitemOnClick($sender) {
         $this->editnewitem->setVisible(false);
         $this->editdetail->setVisible(true);
-    }
-
-
-    public function warehouseOnRow($row) {
-        $item = $row->getDataItem();
-
-        $row->add(new Label('item', $item->itemname));
-        $row->add(new Label('code', $item->item_code));
-        $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', H::mfqty($item->price)));
-        $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id])); 
     }
 
 }
