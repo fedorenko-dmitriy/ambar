@@ -70,7 +70,8 @@ class Order extends \App\Pages\Base
         $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'saveDocOnClick');
 
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
-        $this->docform->add(new Label('total'));
+        $this->docform->add(new Label('total_amount'));
+        $this->docform->add(new Label('total_quantity'));
 
         //Добавление нового товара в счет-фактуру
         $this->add(new Form('editdetail'))->setVisible(false);
@@ -262,7 +263,7 @@ class Order extends \App\Pages\Base
             $item->quantity = $quantity;
             $item->price = $stock->partion;
             $item->price_selling = $price;
-            
+
             unset($this->_tovarlist[$this->_rowid]);
             $this->_tovarlist[$item->item_id] = $item;            
         }
@@ -294,14 +295,14 @@ class Order extends \App\Pages\Base
             'email' => $this->docform->email->getText(),
             'pricetype' => $this->docform->pricetype->getValue(),
             'store' => $this->docform->store->getValue(),
-            'total' => $this->docform->total->getText()
+            'total' => $this->docform->total_amount->getText()
         );
         $this->_doc->detaildata = array();
         foreach ($this->_tovarlist as $tovar) {
             $this->_doc->detaildata[] = $tovar->getData();
         }
 
-        $this->_doc->amount = $this->docform->total->getText();
+        $this->_doc->amount = $this->docform->total_amount->getText();
         //$this->_doc->datatag = $this->_doc->amount;
         $isEdited = $this->_doc->document_id > 0;
 
@@ -343,6 +344,20 @@ class Order extends \App\Pages\Base
     }
 
     /**
+     * Расчет  общего количества
+     *
+     */
+    private function calcOrderQuantity() {
+
+        $quantity = 0;
+
+        foreach ($this->_tovarlist as $item) {
+            $quantity = $quantity + $item->quantity;
+        }
+        $this->docform->total_quantity->setText(H::fqty($quantity));
+    }
+
+    /**
      * Расчет  итого
      *
      */
@@ -355,7 +370,7 @@ class Order extends \App\Pages\Base
 
             $total = $total + $item->amount;
         }
-        $this->docform->total->setText($total);
+        $this->docform->total_amount->setText(H::mfqty($total));
     }
 
     /**
@@ -371,6 +386,13 @@ class Order extends \App\Pages\Base
         }
 
         return !$this->isError();
+    }
+
+    public function beforeRender() {
+        parent::beforeRender();
+
+        $this->calcTotal();
+        $this->calcOrderQuantity();
     }
 
     public function backtolistOnClick($sender) {
