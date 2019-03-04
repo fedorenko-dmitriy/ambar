@@ -63,6 +63,8 @@ class Order extends \App\Pages\Base
 
         $this->docform->add(new SubmitLink('addcust'))->onClick($this, 'addcustOnClick');
 
+        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
+        $this->docform->add(new SubmitLink('addrows'))->onClick($this, 'addRowsOnClick');
         
         $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'saveDocOnClick');
         $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'saveDocOnClick');
@@ -72,19 +74,21 @@ class Order extends \App\Pages\Base
 
         //Добавление нового товара в счет-фактуру
         $this->add(new Form('editdetail'))->setVisible(false);
-        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addRowOnClick');
-
         $this->editdetail->add(new AutocompleteTextInput('edittovar'))->onText($this, 'OnAutoItem');
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
         $this->editdetail->add(new TextInput('editprice'));
 
-        $this->editdetail->edittovar->onChange($this, 'OnChangeItem', true);
+        $this->editdetail->edittovar->onChange($this, 'OnChangeItem', true); //ToDo Выяснить что за метод!
 
-        // $this->editdetail->add(new Label('qtystock'));
         $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
         $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
 
-        // $this->editdetail->add(new BindedTextInput('edittovar', ".reference table"))->onText($this, 'OnAutoItem');
+        // Массовое добавление  товаров в счет-фактуру
+        $this->add(new Form('additems'))->setVisible(false);
+        $this->additems->add(new BindedTextInput('addItem', ".reference table"))->onText($this, 'OnAutoItem2');
+
+        $this->additems->add(new Button('cancelAddItems'))->onClick($this, 'cancelAddItemsOnClick');
+        $this->additems->add(new SubmitButton('saveAddedItems'))->onClick($this, 'saveAddedItemsOnClick');
 
         //добавление нового кантрагента
         $this->add(new Form('editcust'))->setVisible(false);
@@ -133,15 +137,17 @@ class Order extends \App\Pages\Base
     public function detailOnRow($row) {
         $item = $row->getDataItem();
 
+        // var_dump($item); die();
+
         $row->add(new Label('code', $item->item_code));
         $row->add(new Label('tovar', $item->itemname));
         $row->add(new Label('barcode', $item->bar_code));
-        $row->add(new Label('msr', $item->msr));
+        $row->add(new Label('msr',  Messure::findArray("messure_short_name")[$item->msr_id]));
         $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price_1', $item->price));
-        $row->add(new Label('amount_1', round($item->quantity * $item->price)));
-        $row->add(new Label('price_2', $item->price));
-        $row->add(new Label('amount_2', round($item->quantity * $item->price)));
+        $row->add(new Label('price', H::mfqty($item->price)));
+        $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
+        $row->add(new Label('price_selling', H::mfqty($item->price_selling)));
+        $row->add(new Label('amount_selling', H::mfqty($item->quantity * $item->price_selling)));
 
         $row->add(new ClickLink('delete'))->onClick($this, 'deleteOnClick');
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
@@ -153,7 +159,7 @@ class Order extends \App\Pages\Base
         $this->docform->setVisible(false);
 
         $this->editdetail->editquantity->setText($item->quantity);
-        $this->editdetail->editprice->setText($item->price);
+        $this->editdetail->editprice->setText($item->price_selling);
 
         $this->editdetail->edittovar->setKey($item->item_id);
         $this->editdetail->edittovar->setText($item->itemname);
@@ -184,7 +190,10 @@ class Order extends \App\Pages\Base
     public function saveRowOnClick($sender) {
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
-        $id = $this->editdetail->edittovar->getKey();
+        $stock_id = $this->editdetail->edittovar->getKey();
+        $stock = Stock::findOne("stock_id='".$stock_id."'");
+
+        $id = $stock->item_id;
         if ($id == 0) {
             $this->setError("Не выбран товар");
             return;
@@ -192,10 +201,8 @@ class Order extends \App\Pages\Base
 
         $item = Item::load($id);
         $item->quantity = $this->editdetail->editquantity->getText();
-
-
-        $item->price = $this->editdetail->editprice->getText();
-
+        $item->price = $stock->partion;
+        $item->price_selling = $this->editdetail->editprice->getText();
 
         unset($this->_tovarlist[$this->_rowid]);
         $this->_tovarlist[$item->item_id] = $item;
@@ -208,7 +215,6 @@ class Order extends \App\Pages\Base
         $this->editdetail->edittovar->setText('');
 
         $this->editdetail->editquantity->setText("1");
-
         $this->editdetail->editprice->setText("");
     }
 
@@ -220,10 +226,54 @@ class Order extends \App\Pages\Base
         $this->editdetail->edittovar->setText('');
 
         $this->editdetail->editquantity->setText("1");
-
         $this->editdetail->editprice->setText("");
     }
 
+    // Массовый ввод    
+    public function addRowsOnClick($sender) {
+        $this->additems->setVisible(true);
+        $this->docform->setVisible(false);
+    }
+
+    public function cancelAddItemsOnClick(){
+        $this->additems->setVisible(false);
+        $this->docform->setVisible(true);
+    }
+
+    public function saveAddedItemsOnClick(){
+        $value = $this->additems->addItem->getKey();
+
+        $arr = explode("||", $value);
+        if (count($arr) == 0) { //ToDO сделать вывод ошибки
+            $this->setError("Не выбран товар");
+            return;
+        }
+
+        foreach ($arr as $key => $item) {
+            $arr2 = explode("_", $item);
+            $stock_id = $arr2[0];
+            $quantity = $arr2[1]; 
+            $price = $arr2[2];
+
+            $stock = Stock::findOne("stock_id='".$stock_id."'");
+            $id = $stock->item_id;
+
+            $item = Item::load($id);
+            $item->quantity = $quantity;
+            $item->price = $stock->partion;
+            $item->price_selling = $price;
+            
+            unset($this->_tovarlist[$this->_rowid]);
+            $this->_tovarlist[$item->item_id] = $item;            
+        }
+
+        $this->additems->addItem->clean();
+        $this->additems->setVisible(false);
+        $this->docform->setVisible(true);
+        $this->docform->detail->Reload();
+    }
+
+    // Сохранение всего документа
     public function saveDocOnClick($sender) {
         $this->_doc->document_number = $this->docform->document_number->getText();
         $this->_doc->document_date = strtotime($this->docform->document_date->getText());
@@ -301,7 +351,7 @@ class Order extends \App\Pages\Base
         $total = 0;
 
         foreach ($this->_tovarlist as $item) {
-            $item->amount = $item->price * $item->quantity;
+            $item->amount = $item->price_selling * $item->quantity;
 
             $total = $total + $item->amount;
         }
@@ -327,7 +377,7 @@ class Order extends \App\Pages\Base
         App::RedirectBack();
     }
 
-    public function OnChangeItem($sender) {
+    public function OnChangeItem($sender) { // Применение дискаунта
         $id = $sender->getKey();
         $item = Item::load($id);
         $price = $item->getPrice($this->docform->pricetype->getValue());
@@ -378,11 +428,11 @@ class Order extends \App\Pages\Base
         $res = Stock::find($where . " and (itemname like {$text} or item_code like {$text} ) ", "itemname asc");
 
         $array = array();
+        $messures = Messure::findArray("messure_short_name");
 
         foreach ($res as $item) { 
-            $messure = Messure::findArray("messure_short_name")[Item::findOne("item_id=".$item->item_id)->msr_id];
-
-            $array[$item->item_id] = $item->itemname. " | " . $item->qty ." ". $messure;
+            $messure = $messures[Item::findOne("item_id=".$item->item_id)->msr_id];
+            $array[$item->stock_id] = $item->itemname. " | " . $item->qty ." ". $messure;
         }
 
         return $array;
@@ -403,13 +453,14 @@ class Order extends \App\Pages\Base
         $array1 = array();
         $array2 = array();
 
-        foreach ($res as $item) { 
+        $messures = Messure::findArray("messure_short_name");
+
+        foreach ($res as $item) {
+            $array1["id"] = $item->stock_id;
             $array1["item_code"] = $item->item_code;
             $array1["itemname"] = $item->itemname;
-            $array1["msr"] = $item->msr;
+            $array1["msr"] = $messures[Item::findOne("item_id=".$item->item_id)->msr_id];
             $array1["qty"] = $item->qty;
-            $array1["item_id"] = $item->item_id;
-            $array1["storename"] = $item->item_id;
 
             $array2[] = $array1;
         }

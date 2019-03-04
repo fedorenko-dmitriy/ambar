@@ -81,7 +81,7 @@ class BindedTextInput extends TextInput implements Requestable
               $.each(data, function(key, row){
                 
                 var tr = $('<tr>').on('click', function(event){
-                    var id = $(event.target).closest('tr').find('td:first').text();
+                    var id = $(event.target).closest('tr').data('id');
                     var text = $(event.target).closest('tr').find('td').eq(1).text();
                     
                     if($('.selectedItems #item_'+id.replace(/\./g, '-')).length == 0){
@@ -105,7 +105,7 @@ class BindedTextInput extends TextInput implements Requestable
                                         '<i class=\"fa fa-trash\"></i>' +
                                     '</a>' +    
                                 '</div>' +
-                                '<input type=\"hidden\" class=\"item_code\" value=\"'+id+'\"/>'+
+                                '<input type=\"hidden\" class=\"id\" value=\"'+id+'\"/>'+
                             '</div>'
                         );
 
@@ -116,12 +116,13 @@ class BindedTextInput extends TextInput implements Requestable
                     }
                 });
 
+                tr.data('id', row.id);
+
                 var td = '';
                 if(row.item_code) td = td + '<td>'+row.item_code+'</td>'; 
                 if(row.itemname) td = td + '<td>'+row.itemname+'</td>';
                 if(row.qty) td = td + '<td>'+row.qty+'</td>';
                 if(row.msr) td = td + '<td>'+row.msr+'</td>';
-                // if(row.item_code) td = td + '<td>'+row.item_code+'</td>';
 
                 tr.append(td);
 
@@ -133,16 +134,15 @@ class BindedTextInput extends TextInput implements Requestable
         window.addItems = function(){
             var value = '';
             $('.selectedItems').children().each(function(key, group){
-                var item_code = $(group).find('input.item_code').val();
+                var id = $(group).find('input.id').val();
                 var qty = $(group).find('input.qty').val();
                 var price = $(group).find('input.price').val();
 
-                if(item_code){
+                if(id){
                     if(key>0 && value) {
                         value = value + '||';
                     }
-                    value = value+item_code+'_'+qty+'_'+price; 
-
+                    value = value + id + '_' + qty + '_'+price; 
                 }
             });
             $(\"#{$this->id}_id\").val(value);

@@ -62,7 +62,7 @@
             <div class="row">
                 <div class="col-12">
                     <a zippy="addrow">Добавить товар</a>
-                    <!-- <a zippy="addrows">Массовый ввод</a> -->
+                    <a zippy="addrows">Массовый ввод</a>
                     <table class="table table-bordered table-sm">
                         <thead>
                             <tr>
@@ -89,10 +89,10 @@
                                 <td zippy="barcode"></td>
                                 <td zippy="msr"></td>
                                 <td zippy="quantity" class="text-right"></td>
-                                <td zippy="price_1" class="text-right"></td>
-                                <td zippy="amount_1" class="text-right"></td>
-                                <td zippy="price_2" class="text-right"></td>
-                                <td zippy="amount_2" class="text-right"></td>
+                                <td zippy="price" class="text-right"></td>
+                                <td zippy="amount" class="text-right"></td>
+                                <td zippy="price_selling" class="text-right"></td>
+                                <td zippy="amount_selling" class="text-right"></td>
                                 <td>
                                     <a zippy="edit"><i class="fa fa-edit"></i></a>
                                     <a zippy="delete"><i class="fa fa-trash"></i></a>
@@ -161,61 +161,43 @@
             <div class="modal-backdrop fade show"></div>
         </form>
 
-
-
-<!--         <form zippy="editdetail">
+        <form zippy="additems"> 
             <h4>Ввод товара </h4>
-
+            <div class="form-group">
+                <label for="edititem">Название</label>
+                <input placeholder="Начните вводить..." class="form-control " zippy="addItem" />
+            </div>
             <div class="row">
-                <div class="col-12 col-md-4 col-xl-3">
-
-                    <div class="form-group">
-                        <label for="edittovar" >Название</label>
-                        <input placeholder="Начните вводить..." class="form-control "   zippy="edittovar" />
-
-                        <!-- Наличие : <span zippy="qtystock"></span> 
-
-                    </div>
+                <div class="col-4 selectedItems">
                     <div class="row">
-                        <div class="form-group col-6">
-                            <label for="editquantity" >Количество</label>
-                            <input autocomplete="off" class="form-control" type="text" zippy="editquantity" required="required" pattern="[0-9\.]+"  style="width: 70px;">
+                        <div class="col-12 form-group">
+                            <button type="submit" zippy="saveAddedItems" class="btn btn-outline-primary">Сохранить</button> 
+                            <button type="button" zippy="cancelAddItems" class="btn btn-light ">Отменить</button> 
                         </div>
-                        <div class="form-group col-6">
-                            <label for="editprice" >Цена  </label>
-                            <input autocomplete="off" class="form-control" type="text" zippy="editprice" required="required" pattern="[0-9]+" style="width: 70px;">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <button type="submit" zippy="submitrow" class="btn btn-outline-primary ">Сохранить</button>
-                        <button type="button" zippy="cancelrow" class="btn btn-light ">Отменить</button>
-                    </div>
+                    </div> 
                 </div>
-                
-                 <div class="col-8 reference">
+                <div class="col-8 reference">
                     <table class="table table-bordered table-striped table-sm ">
                         <thead>
                             <tr>
                                 <th>Код</th>
                                 <th>Наименование</th>
-                                <th>Ед.</th>
                                 <th>Кол.</th>
+                                <th>Ед.изм.</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr zippy="warehouse">
                                 <td zippy="code"></td>
                                 <td zippy="item"></td>
-                                <td zippy="msr"></td>
                                 <td zippy="quantity"></td>
+                                <td zippy="msr"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </form> -->
-
+        </form>
 
         <form zippy="editcust">
             <h3>Новый контрагент </h3>
@@ -229,7 +211,6 @@
                         <label for="editcustphone">Телефон</label>
                         <input class="form-control" type="text" zippy="editcustphone"  ></input>
                     </div>
-
                     <div class="form-group">
                         <button type="submit" zippy="savecust" class="btn btn-outline-primary">Сохранить</button>
                         <button type="button" zippy="cancelcust" class="btn btn-light ">Отменить</button>
