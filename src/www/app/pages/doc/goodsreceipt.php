@@ -391,6 +391,13 @@ class GoodsReceipt extends \App\Pages\Base
             }
 
             $conn->CommitTrans();
+
+            if ($isEdited){          
+                App::RedirectBack();
+            } 
+            else{
+                App::Redirect("\\App\\Pages\\Register\\GRList");
+            }
         } catch (\Exception $ee) {
             global $logger;
             $conn->RollbackTrans();
