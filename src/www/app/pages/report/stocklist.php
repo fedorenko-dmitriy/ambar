@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Pages\Register;
+namespace App\Pages\Report;
 
 use \Zippy\Html\DataList\DataView;
 use \Zippy\Html\Form\DropDownChoice;
