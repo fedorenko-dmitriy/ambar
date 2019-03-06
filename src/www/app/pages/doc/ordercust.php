@@ -41,10 +41,12 @@ class OrderCust extends \App\Pages\Base
     public function __construct($docid = 0, $basedocid = 0) {
         parent::__construct();
 
+        $common = System::getOptions("common");
+
         $this->add(new Form('docform'));
         $this->docform->add(new TextInput('document_number'));
         $this->docform->add(new Date('document_date'))->setDate(time());
-        $this->docform->add(new DropDownChoice('document_currency', Currency::findArray("currency_name")));
+        $this->docform->add(new DropDownChoice('document_currency', Currency::findArray("currency_name"), $common["default_currency"]));
         $this->docform->add(new AutocompleteTextInput('customer'))->onText($this, 'OnAutoCustomer');
         $this->docform->add(new TextInput('notes')); 
 
@@ -58,6 +60,8 @@ class OrderCust extends \App\Pages\Base
 
         $this->docform->add(new Label('total'));
         $this->docform->add(new Label('order_quantity'));
+
+        $this->docform->document_currency->setVisible($common['useval'] == true);
 
         //Добавление нового товара в заказ поставщику
         $this->add(new Form('editdetail'))->setVisible(false);
