@@ -186,15 +186,15 @@ class GoodsReceipt extends \App\Pages\Base
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id]));
         $row->add(new Label('quantity', H::fqty($item->quantity)));
 
-        $row->add(new Label('price_income', H::mfqty($item->price_income)));
-        $row->add(new Label('amount_income', H::mfqty($item->quantity * $item->price_income)));
+        $row->add(new Label('price_income', H::famt($item->price_income)));
+        $row->add(new Label('amount_income', H::famt($item->quantity * $item->price_income)));
 
         if($common['useval'] == true){
             if(!isset($item->price)){
                 $item->price = $item->price_income * $this->getCurrencyRate();
             }
-            $row->add(new Label('price', H::mfqty($item->price)));
-            $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
+            $row->add(new Label('price', H::famt($item->price)));
+            $row->add(new Label('amount', H::famt($item->quantity * $item->price)));
         }
 
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
@@ -431,8 +431,8 @@ class GoodsReceipt extends \App\Pages\Base
             $item->amount = ($item->amount_income * $currency_rate);
             $total = $total + $item->amount_income;
         }
-        $this->docform->total_amount_income->setText(H::mfqty($total));
-        $this->docform->total_amount->setText(H::mfqty($total * $this->getCurrencyRate()));
+        $this->docform->total_amount_income->setText(H::famt($total));
+        $this->docform->total_amount->setText(H::famt($total * $this->getCurrencyRate()));
     }
 
     /**

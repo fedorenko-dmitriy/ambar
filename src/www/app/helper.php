@@ -380,6 +380,7 @@ class Helper
         \App\Application::RedirectHome();
     }
 
+    // нули после запятой в количестве
     public static function fqty($qty) {
         $digit = 0;
         $common = System::getOptions("common");
@@ -393,16 +394,19 @@ class Helper
         }
     }
 
-    public static function mfqty($qty) {
+    // нули после запятой в количестве
+    public static function famt($amount) {
+        if (strlen($amount) == 0)
+            return '';
         $digit = 0;
         $common = System::getOptions("common");
-        if ($common['moneyQtyDigits'] > 0) {
-            $digit = $common['moneyQtyDigits'];
+        if ($common['amtdigits'] > 0) {
+            $digit = $common['amtdigits'];
         }
         if ($digit == 0) {
-            return round($qty);
+            return round($amount);
         } else {
-            return number_format($qty, $digit, '.', '');
+            return number_format($amount, $digit, '.', '');
         }
     }
 }

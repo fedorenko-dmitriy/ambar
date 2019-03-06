@@ -122,8 +122,8 @@ class OrderCust extends \App\Pages\Base
         $row->add(new Label('quantity', H::fqty($item->quantity)));
         $row->add(new Label('msr', Messure::findArray("messure_short_name")[$item->msr_id])); 
 
-        $row->add(new Label('price_income', H::mfqty($item->price_income)));
-        $row->add(new Label('amount_income', H::mfqty($item->quantity * $item->price_income)));
+        $row->add(new Label('price_income', H::famt($item->price_income)));
+        $row->add(new Label('amount_income', H::famt($item->quantity * $item->price_income)));
 
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
         $row->edit->setVisible($item->old != true);
@@ -359,7 +359,7 @@ class OrderCust extends \App\Pages\Base
             $item->amount = $item->price_income * $item->quantity;
             $total = $total + $item->amount_income;
         }
-        $this->docform->total->setText(H::mfqty($total));
+        $this->docform->total->setText(H::famt($total));
     }
 
     /**

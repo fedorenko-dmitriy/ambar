@@ -145,10 +145,10 @@ class Order extends \App\Pages\Base
         $row->add(new Label('barcode', $item->bar_code));
         $row->add(new Label('msr',  Messure::findArray("messure_short_name")[$item->msr_id]));
         $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', H::mfqty($item->price)));
-        $row->add(new Label('amount', H::mfqty($item->quantity * $item->price)));
-        $row->add(new Label('price_selling', H::mfqty($item->price_selling)));
-        $row->add(new Label('amount_selling', H::mfqty($item->quantity * $item->price_selling)));
+        $row->add(new Label('price', H::famt($item->price)));
+        $row->add(new Label('amount', H::famt($item->quantity * $item->price)));
+        $row->add(new Label('price_selling', H::famt($item->price_selling)));
+        $row->add(new Label('amount_selling', H::famt($item->quantity * $item->price_selling)));
 
         $row->add(new ClickLink('delete'))->onClick($this, 'deleteOnClick');
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
@@ -370,7 +370,7 @@ class Order extends \App\Pages\Base
 
             $total = $total + $item->amount;
         }
-        $this->docform->total_amount->setText(H::mfqty($total));
+        $this->docform->total_amount->setText(H::famt($total));
     }
 
     /**

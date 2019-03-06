@@ -34,7 +34,7 @@ class Options extends \App\Pages\Base
         $this->common->add(new TextInput('firmname'));
         $this->common->add(new DropDownChoice('defstore', \App\Entity\Store::getList()));
         $this->common->add(new DropDownChoice('qtydigits'));
-        $this->common->add(new DropDownChoice('moneyQtyDigits'));
+        $this->common->add(new DropDownChoice('amtdigits'));
 
         $this->common->add(new DropDownChoice('default_currency', Currency::getList()));
         $this->common->add(new CheckBox('useval'))->onChange($this, "onVal");
@@ -58,7 +58,7 @@ class Options extends \App\Pages\Base
         $this->common->firmname->setText($common['firmname']);
         $this->common->defstore->setValue($common['defstore']);
         $this->common->qtydigits->setValue($common['qtydigits']);
-        $this->common->moneyQtyDigits->setValue($common['moneyQtyDigits']);
+        $this->common->amtdigits->setValue($common['amtdigits']);
         $this->common->price1->setText($common['price1']);
         $this->common->price2->setText($common['price2']);
         $this->common->price3->setText($common['price3']);
@@ -119,7 +119,7 @@ class Options extends \App\Pages\Base
         $common['firmname'] = $this->common->firmname->getText();
         $common['defstore'] = $this->common->defstore->getValue();
         $common['qtydigits'] = $this->common->qtydigits->getValue(); 
-        $common['moneyQtyDigits'] = $this->common->moneyQtyDigits->getValue();
+        $common['amtdigits'] = $this->common->amtdigits->getValue();
         $common['price1'] = $this->common->price1->getText();
         $common['price2'] = $this->common->price2->getText();
         $common['price3'] = $this->common->price3->getText();
