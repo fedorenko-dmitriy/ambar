@@ -57,7 +57,7 @@ class GoodsReceipt extends \App\Pages\Base
         $this->docform->add(new TextInput('document_currency_rate'));
         $this->docform->document_currency_rate->setAttribute("disabled","disabled");
 
-        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
+        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addRowOnClick');
         $this->docform->add(new SubmitLink('addrows'))->onClick($this, 'addRowsOnClick');
 
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
@@ -80,8 +80,8 @@ class GoodsReceipt extends \App\Pages\Base
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
         $this->editdetail->add(new TextInput('editprice'));
 
-        $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelrowOnClick');
-        $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saverowOnClick');
+        $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
+        $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
 
         // Массовое добавление  товаров в заказ
         $this->add(new Form('additems'))->setVisible(false);
@@ -230,13 +230,13 @@ class GoodsReceipt extends \App\Pages\Base
     }
 
     // Добавление одной позиции
-    public function addrowOnClick($sender) {
+    public function addRowOnClick($sender) {
         $this->editdetail->setVisible(true);
         $this->docform->setVisible(true);
         $this->_rowid = 0;
     }
 
-    public function saverowOnClick($sender) {
+    public function saveRowOnClick($sender) {
         $id = $this->editdetail->edititem->getKey();
         $name = trim($this->editdetail->edititem->getText());
         $currency_rate = $this->docform->document_currency_rate->getValue();
@@ -273,7 +273,7 @@ class GoodsReceipt extends \App\Pages\Base
         $this->editdetail->editprice->setText("");
     }
 
-    public function cancelrowOnClick($sender) {
+    public function cancelRowOnClick($sender) {
         $this->editdetail->setVisible(false);
         $this->docform->setVisible(true);
     }
@@ -295,7 +295,7 @@ class GoodsReceipt extends \App\Pages\Base
         $currency_rate = empty($currency_rate) ? 1 : $currency_rate;
 
         $arr = explode("||", $value);
-        if (count($arr) == 0) { //ToDO сделать вывод ошибки
+        if (count($arr) == 1 && count(explode("_", $arr[0]))<3) {
             $this->setError("Не выбран товар");
             return;
         }

@@ -50,13 +50,13 @@ class OrderCust extends \App\Pages\Base
         $this->docform->add(new AutocompleteTextInput('customer'))->onText($this, 'OnAutoCustomer');
         $this->docform->add(new TextInput('notes')); 
 
-        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
+        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addRowOnClick');
         $this->docform->add(new SubmitLink('addrows'))->onClick($this, 'addRowsOnClick');
         
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
-        $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'savedocOnClick');
-        $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
-        $this->docform->add(new SubmitButton('apprdoc'))->onClick($this, 'savedocOnClick');
+        $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'saveDocOnClick');
+        $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'saveDocOnClick');
+        $this->docform->add(new SubmitButton('apprdoc'))->onClick($this, 'saveDocOnClick');
 
         $this->docform->add(new Label('total'));
         $this->docform->add(new Label('order_quantity'));
@@ -161,7 +161,7 @@ class OrderCust extends \App\Pages\Base
         $this->docform->detail->Reload();
     }
 
-    public function addrowOnClick($sender) {
+    public function addRowOnClick($sender) {
         $this->editdetail->setVisible(true);
         $this->docform->setVisible(true);
         $this->_rowid = 0;
@@ -219,7 +219,8 @@ class OrderCust extends \App\Pages\Base
     public function saveAddedItemsOnClick(){
         $value = $this->additems->addItem->getKey();
         $arr = explode("||", $value);
-        if (count($arr) == 0) { //ToDO сделать вывод ошибки
+
+        if (count($arr) == 1 && count(explode("_", $arr[0]))<3) {
             $this->setError("Не выбран товар");
             return;
         }
@@ -244,7 +245,7 @@ class OrderCust extends \App\Pages\Base
         $this->docform->detail->Reload();
     }
 
-    public function savedocOnClick($sender) {
+    public function saveDocOnClick($sender) {
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
 

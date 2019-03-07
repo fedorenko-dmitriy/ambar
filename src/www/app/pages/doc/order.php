@@ -245,7 +245,7 @@ class Order extends \App\Pages\Base
         $value = $this->additems->addItem->getKey();
 
         $arr = explode("||", $value);
-        if (count($arr) == 0) { //ToDO сделать вывод ошибки
+        if (count($arr) == 1 && count(explode("_", $arr[0]))<3) {
             $this->setError("Не выбран товар");
             return;
         }
