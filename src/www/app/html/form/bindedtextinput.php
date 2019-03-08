@@ -92,7 +92,7 @@ class BindedTextInput extends TextInput implements Requestable
                                     '<div class=\"row\">' +
                                         '<div class=\"form-group col-6\">' +
                                             '<label for=\"editquantity\">Количество</label>' +
-                                            '<input autocomplete=\"off\" class=\"form-control qty\" type=\"text\" required=\"required\" pattern=\"[0-9\.]+\"onchange=\"window.addItems();\"/>' +
+                                            '<input autocomplete=\"off\" class=\"form-control qty\" type=\"text\" required=\"required\" value=\"1\" pattern=\"^([1-9][0-9]{0,2}|1000)(,([1-9][0-9]{0,2}|1000))*$\" onchange=\"window.addItems();\"/>' +
                                         '</div>' +
                                         '<div class=\"col-6 form-group\">' +
                                             '<label for=\"editprice\">Цена</label>' +
