@@ -148,8 +148,8 @@
                 <div class="modal-backdrop fade show"></div>
             </form>
 
-        <form zippy="additems"> 
-            <h4>Ввод товара </h4>
+        <form zippy="additems" onkeypress="return event.keyCode != 13;"> 
+            <h4>Массовый ввод товара </h4>
             <div class="form-group">
                 <label for="edititem">Название</label>
                 <input placeholder="Начните вводить..." class="form-control " zippy="addItem" />

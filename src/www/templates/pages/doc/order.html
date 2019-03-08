@@ -15,7 +15,6 @@
                         <label for="customer" >Покупатель</label> <a style="font-size:smaller" zippy="addcust">Добавить нового</a>
                         <input placeholder="Начните вводить..." class="form-control "   zippy="customer" />
                         <span zippy="discount" style="display:block;font-size:smaller"></span>
-                        
                     </div>
                     <div class="form-group  ">
                         <label for="phone"  >Телефон</label>
@@ -121,6 +120,7 @@
                 </div>
             </div>
         </form>
+
         <form zippy="editdetail">
             <div class="modal fade show" tabindex="-1" style="display: block;" role="dialog">
                 <div class="modal-dialog" role="document">
@@ -165,8 +165,8 @@
             <div class="modal-backdrop fade show"></div>
         </form>
 
-        <form zippy="additems"> 
-            <h4>Ввод товара </h4>
+        <form zippy="additems" onkeypress="return event.keyCode != 13;> 
+            <h4>Массовый ввод товара </h4>
             <div class="form-group">
                 <label for="edititem">Название</label>
                 <input placeholder="Начните вводить..." class="form-control " zippy="addItem" />
