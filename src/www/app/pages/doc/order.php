@@ -478,7 +478,7 @@ class Order extends \App\Pages\Base
         $messures = Messure::findArray("messure_short_name");
 
         foreach ($res as $item) {
-            $array1["id"] = $item->stock_id;
+            $array1["stock_id"] = $item->stock_id;
             $array1["item_code"] = $item->item_code;
             $array1["itemname"] = $item->itemname;
             $array1["msr"] = $messures[Item::findOne("item_id=".$item->item_id)->msr_id];

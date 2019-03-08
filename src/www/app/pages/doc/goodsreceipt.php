@@ -302,11 +302,11 @@ class GoodsReceipt extends \App\Pages\Base
 
         foreach ($arr as $key => $item) {
             $arr2 = explode("_", $item);
-            $item_code = $arr2[0];
+            $item_id = $arr2[0];
             $quantity = $arr2[1]; 
             $price = $arr2[2];
 
-            $item = Item::findOne("item_code='".$item_code."'");
+            $item = Item::findOne("item_id='".$item_id."'");
             $item->quantity = $quantity;
             $item->price_income = $price;
             $item->price = $item->price_income * $currency_rate;
@@ -510,7 +510,8 @@ class GoodsReceipt extends \App\Pages\Base
         $array1 = array();
         $array2 = array();
 
-        foreach ($res as $item) { 
+        foreach ($res as $item) {
+            $array1["item_id"] = $item->item_id;
             $array1["item_code"] = $item->item_code;
             $array1["itemname"] = $item->itemname;
             $array1["msr"] = Messure::findArray("messure_short_name")[$item->msr_id];

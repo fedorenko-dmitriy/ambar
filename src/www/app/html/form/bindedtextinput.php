@@ -116,7 +116,11 @@ class BindedTextInput extends TextInput implements Requestable
                     }
                 });
 
-                tr.data('id', row.id);
+                var some_item_id;
+                if(row.item_id) some_item_id = row.item_id;
+                else if(row.stock_id) some_item_id = row.stock_id; 
+
+                tr.data('id', some_item_id);
 
                 var td = '';
                 if(row.item_code) td = td + '<td>'+row.item_code+'</td>'; 

@@ -227,11 +227,11 @@ class OrderCust extends \App\Pages\Base
 
         foreach ($arr as $key => $item) {
             $arr2 = explode("_", $item);
-            $item_code = $arr2[0];
+            $item_id = $arr2[0];
             $quantity = $arr2[1]; 
             $price = $arr2[2];
 
-            $item = Item::findOne("item_code='".$item_code."'");
+            $item = Item::findOne("item_id='".$item_id."'");
             $item->quantity = $quantity;
             $item->price_income = $price;
 
@@ -361,7 +361,7 @@ class OrderCust extends \App\Pages\Base
         $total = 0;
 
         foreach ($this->_itemlist as $item) {
-            $item->amount = $item->price_income * $item->quantity;
+            $item->amount_income = $item->price_income * $item->quantity;
             $total = $total + $item->amount_income;
         }
         $this->docform->total->setText(H::famt($total));
@@ -410,10 +410,10 @@ class OrderCust extends \App\Pages\Base
         $array2 = array();
 
         foreach ($res as $item) { 
+            $array1["item_id"] = $item->item_id;
             $array1["item_code"] = $item->item_code;
             $array1["itemname"] = $item->itemname;
             $array1["msr"] = Messure::findArray("messure_short_name")[$item->msr_id];
-            $array1["item_id"] = $item->item_id;
 
             $array2[] = $array1;
         }
