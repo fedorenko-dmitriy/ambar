@@ -52,7 +52,6 @@ class Order extends \App\Pages\Base
 
         $this->docform->add(new TextArea('notes'));
 
-
         $this->docform->add(new Label('discount'))->setVisible(false);
         $this->docform->add(new DropDownChoice('pricetype', Item::getPriceTypeList()))->onChange($this, 'OnChangePriceType');
 
@@ -192,16 +191,23 @@ class Order extends \App\Pages\Base
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
         $stock_id = $this->editdetail->edittovar->getKey();
-        $stock = Stock::findOne("stock_id='".$stock_id."'");
-
-        $id = $stock->item_id;
-        if ($id == 0) {
+      
+        if ($stock_id == 0) {
             $this->setError("Не выбран товар");
             return;
         }
 
-        $item = Item::load($id);
+        $stock = Stock::findOne("stock_id='".$stock_id."'");
+        $item = Item::load($stock->item_id);
         $item->quantity = $this->editdetail->editquantity->getText();
+
+        $msr = Messure::findOne("messure_id='".$item->msr_id."'");
+
+        if($item->quantity > $stock->qty){
+            $this->setError("Нет такого количества товара в наличии. На складе всего ". $stock->qty ."".$msr->messure_short_name);
+            return;
+        }
+        
         $item->price = $stock->partion;
         $item->price_selling = $this->editdetail->editprice->getText();
 
@@ -242,6 +248,7 @@ class Order extends \App\Pages\Base
     }
 
     public function saveAddedItemsOnClick(){
+        $isItemsLacks;
         $value = $this->additems->addItem->getKey();
 
         $arr = explode("||", $value);
@@ -257,16 +264,26 @@ class Order extends \App\Pages\Base
             $price = $arr2[2];
 
             $stock = Stock::findOne("stock_id='".$stock_id."'");
-            $id = $stock->item_id;
-
-            $item = Item::load($id);
+            $item = Item::load($stock->item_id);
             $item->quantity = $quantity;
+
+            //ToDo подготовит полноценную валидацию количества товара
+            // $msr = Messure::findOne("messure_id='".$item->msr_id."'");
+
+            // if($item->quantity > $stock->qty){
+            //     $this->setError("Нет такого количества товара в наличии. На складе всего ". $stock->qty ."".$msr->messure_short_name. " ". $item->itemname);
+            //     $isItemsLacks = true;
+            //     break;
+            // }
+
             $item->price = $stock->partion;
             $item->price_selling = $price;
 
             unset($this->_tovarlist[$this->_rowid]);
             $this->_tovarlist[$item->item_id] = $item;            
         }
+
+        // if($isItemsLacks) return;
 
         $this->additems->addItem->clean();
         $this->additems->setVisible(false);
@@ -313,11 +330,9 @@ class Order extends \App\Pages\Base
 
             $this->_doc->updateStatus($isEdited ? Document::STATE_EDITED : Document::STATE_NEW);
 
-
             if ($sender->id == 'execdoc') {
                 // $this->_doc->updateStatus(Document::STATE_INPROCESS);       
             }
-
 
             if ($this->_basedocid > 0) {
                 $this->_doc->AddConnectedDoc($this->_basedocid);
@@ -452,9 +467,9 @@ class Order extends \App\Pages\Base
         $array = array();
         $messures = Messure::findArray("messure_short_name");
 
-        foreach ($res as $item) { 
-            $messure = $messures[Item::findOne("item_id=".$item->item_id)->msr_id];
-            $array[$item->stock_id] = $item->itemname. " | " . $item->qty ." ". $messure;
+        foreach ($res as $stock_item) { 
+            $messure = $messures[Item::findOne("item_id=".$stock_item->item_id)->msr_id];
+            $array[$stock_item->stock_id] = $stock_item->itemname. " | " . $stock_item->qty ." ". $messure;
         }
 
         return $array;
