@@ -156,7 +156,8 @@ select
 `i`.`bar_code` AS `bar_code`,
 `i`.`cat_name` AS `cat_name`,
 `stores`.`storename` AS `storename`,
-`st`.`qty` AS `qty` 
+`st`.`qty` AS `qty`,
+`st`.`reserved_quantity` AS `reserved_quantity` 
 from 
 ((`store_stock` `st` join `items_view` `i` on((`i`.`item_id` = `st`.`item_id`))) join `stores` on((`stores`.`store_id` = `st`.`store_id`))) 
 

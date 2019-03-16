@@ -18,16 +18,26 @@ use \Zippy\Html\Link\ClickLink;
 use \Zippy\Html\Link\SubmitLink;
 use \App\Entity\Customer;
 use \App\Entity\Doc\Document;
-use App\Entity\Messure;
+use \App\Entity\Messure;
 use \App\Entity\Item;
 use \App\Entity\Stock;
 use \App\Entity\Store;
+use \App\Entity\Reservation; 
 use \App\Helper as H;
 use \App\Application as App;
 
 /**
  * Страница  ввода  заказа
+
+    Статусы документа:
+        - const STATE_NEW = 1; Новая (создается автоматически при заказе онлайн)
+        - const STATE_APPROVED = 4; Подтверждена (человек подтвердил покупку)
+        - const STATE_EXECUTED = 5; Выполнена (на основе товара создана Расходная накладная)
+        - const STATE_CANCELED = 3; (отменена сотрудником)
+        - const STATE_REFUSED = 15; Отклонена (отклонена покупателем)
+
  */
+
 class Order extends \App\Pages\Base
 {
 
@@ -55,10 +65,23 @@ class Order extends \App\Pages\Base
         $this->docform->add(new Label('discount'))->setVisible(false);
         $this->docform->add(new DropDownChoice('pricetype', Item::getPriceTypeList()))->onChange($this, 'OnChangePriceType');
 
-        $this->docform->add(new DropDownChoice('delivery', array(1 => 'Самовывоз', 2 => 'Курьер', 3 => 'Почта')))->onChange($this, 'OnDelivery');
+        $this->docform->add(new DropDownChoice('delivery', array(
+            1 => 'Самовывоз', 
+            2 => 'Курьер', 
+            3 => 'Почта')
+        ))->onChange($this, 'OnDelivery');
+
         $this->docform->add(new TextInput('email'));
         $this->docform->add(new TextInput('phone'));
         $this->docform->add(new TextInput('address'))->setVisible(false);
+
+        $this->docform->add(new DropDownChoice('state', array(
+            Document::STATE_NEW => "Новая", 
+            Document::STATE_APPROVED => "Подтверждена", 
+            Document::STATE_EXECUTED => "Выполнена",
+            Document::STATE_CANCELED => "Отменена",
+            Document::STATE_REFUSED => "Отклонена"), Document::STATE_APPROVED
+        ));
 
         $this->docform->add(new SubmitLink('addcust'))->onClick($this, 'addcustOnClick');
 
@@ -99,9 +122,15 @@ class Order extends \App\Pages\Base
 
         if ($docid > 0) {    //загружаем   содержимок  документа настраницу
             $this->_doc = Document::load($docid);
-            $this->docform->document_number->setText($this->_doc->document_number);
 
+            // var_dump($this->_doc); die();
+            $this->docform->document_number->setText($this->_doc->document_number);
             $this->docform->document_date->setDate($this->_doc->document_date);
+
+            $this->docform->customer->setKey($this->_doc->customer_id);
+            $this->docform->customer->setText($this->_doc->customer_name);
+            $this->docform->state->setValue($this->_doc->state);
+
             $this->docform->pricetype->setValue($this->_doc->headerdata['pricetype']);
 
             $this->docform->delivery->setValue($this->_doc->headerdata['delivery']);
@@ -136,8 +165,6 @@ class Order extends \App\Pages\Base
 
     public function detailOnRow($row) {
         $item = $row->getDataItem();
-
-        // var_dump($item); die();
 
         $row->add(new Label('code', $item->item_code));
         $row->add(new Label('tovar', $item->itemname));
@@ -208,6 +235,7 @@ class Order extends \App\Pages\Base
             return;
         }
         
+        $item->stock_id = $stock_id;
         $item->price = $stock->partion;
         $item->price_selling = $this->editdetail->editprice->getText();
 
@@ -276,6 +304,7 @@ class Order extends \App\Pages\Base
             //     break;
             // }
 
+            $item->stock_id = $stock_id;
             $item->price = $stock->partion;
             $item->price_selling = $price;
 
@@ -296,7 +325,10 @@ class Order extends \App\Pages\Base
         $this->_doc->document_number = $this->docform->document_number->getText();
         $this->_doc->document_date = strtotime($this->docform->document_date->getText());
         $this->_doc->notes = $this->docform->notes->getText();
+        $this->_doc->customer_name = $this->docform->customer->getText();
         $this->_doc->customer_id = $this->docform->customer->getKey();
+        $this->_doc->state = $this->docform->state->getValue();
+
         if ($this->checkForm() == false) {
             return;
         }
@@ -328,7 +360,7 @@ class Order extends \App\Pages\Base
         try {
             $this->_doc->save();
 
-            $this->_doc->updateStatus($isEdited ? Document::STATE_EDITED : Document::STATE_NEW);
+            // $this->_doc->updateStatus($isEdited ? Document::STATE_EDITED : Document::STATE_NEW);
 
             if ($sender->id == 'execdoc') {
                 // $this->_doc->updateStatus(Document::STATE_INPROCESS);       
@@ -339,6 +371,9 @@ class Order extends \App\Pages\Base
                 $this->_basedocid = 0;
             }
             $conn->CommitTrans();
+
+            $this->stockReservationHandler();
+
             if ($sender->id == 'execdoc') {
                 App::Redirect("\\App\\Pages\\Doc\\GoodsIssue", 0, $this->_doc->document_id);
                 return;
@@ -355,6 +390,22 @@ class Order extends \App\Pages\Base
 
             $logger->error($ee->getMessage() . " Документ " . $this->_doc->meta_desc);
             return;
+        }
+    }
+
+    private function stockReservationHandler(){
+
+        $reserved = Reservation::findOne("document_id='".$this->_doc->document_id."'");
+        if ($this->_doc->state != Document::STATE_APPROVED) {
+            if($reserved){
+                Reservation::removeAllItems($this->_doc->document_id);
+            }
+        } else {
+            if($reserved){
+                Reservation::updateItems($this->_doc->detaildata, $this->_doc->document_id);
+            } else {
+                Reservation::createItems($this->_doc->detaildata, $this->_doc->document_id);
+            }
         }
     }
 

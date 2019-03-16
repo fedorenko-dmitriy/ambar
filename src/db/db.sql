@@ -771,3 +771,45 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+CREATE TABLE `reservation_list` (
+	`reservation_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`document_id` INT(11) NULL DEFAULT NULL,
+	`stock_id` INT(11) NULL DEFAULT NULL,
+	`quantity` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`reservation_id`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=8
+;
+
+/*!50003 CREATE*/ /*!50017  */ /*!50003 TRIGGER `reservation_list_after_ins_tr` AFTER INSERT ON `reservation_list`
+  FOR EACH ROW
+BEGIN
+
+ IF new.stock_id >0 then
+  update store_stock set reserved_quantity=(select  coalesce(sum(quantity),0) from reservation_list where stock_id=new.stock_id) where store_stock.stock_id = new.stock_id;
+ END IF;
+END ;;  */
+
+
+/*!50003 CREATE*/ /*!50017  */ /*!50003 TRIGGER `reservation_list_after_upd_tr` AFTER UPDATE ON `reservation_list`
+  FOR EACH ROW
+BEGIN
+
+ IF new.stock_id >0 then
+  update store_stock set reserved_quantity=(select  coalesce(sum(quantity),0) from reservation_list where stock_id=new.stock_id) where store_stock.stock_id = new.stock_id;
+ END IF;
+END ;;*/
+
+
+/*!50003 CREATE*/ /*!50017  */ /*!50003 TRIGGER `eservation_list_after_del_tr` AFTER DELETE ON `eservation_list`
+  FOR EACH ROW
+BEGIN
+
+ IF old.stock_id >0 then
+  update store_stock set reserved_quantity=(select  coalesce(sum(quantity),0) from eservation_list where stock_id=old.stock_id) where store_stock.stock_id = old.stock_id;
+ END IF;
+END ;; */
+
+

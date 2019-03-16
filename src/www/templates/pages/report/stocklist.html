@@ -4,67 +4,63 @@
 
     <body>
         <div class="row">
-
-            <div class="col-12   col-xl-10" zippy="itemtable">
-                <h3>Товары на  складе </h3>
+            <div class="col-12 col-xl-12" zippy="itemtable">
+                <h3>Товары на складе </h3>
                 <form zippy="filter" class="form-inline">
-
-
-                    <input autocomplete="off" placeholder="Имя  или  код..." class="form-control mr-sm-2" type="text" zippy="searchkey">
-                    <label for="searchstore">склад</label>
-
+                    <label for="searchkey" class="col-form-label">Товар</label>
+                    <input autocomplete="off" placeholder="Имя  или  код..." class="form-control mr-sm-2" type="text" zippy="searchkey" />
+                    <label for="searchstore" class="col-form-label">склад</label>
                     <select   class="form-control mr-sm-2" zippy="searchstore">
                         <option value="0">Все склады </option>
                     </select>         
-                    <label for="searchcat">категория</label>
+                    <label for="searchcat" class="col-form-label">категория</label>
 
                     <select   class="form-control mr-sm-2" zippy="searchcat">
                         <option value="0">Не задана</option>
                     </select>         
-
-
-                    <input class="btn btn-outline-success  " type="submit" value="ОК">
-
+                    <button class="btn btn-outline-success  " type="submit">ОК</button>
                 </form>
-                    <a zippy="csv"  >Скачать  CSV</a>  
-           
-                <table class="table   table-responsive-sm   table-sm  table-hover ">
-                    <tr>
-                        <th>Склад</th>
-                        <th>Название</th>
+                <a zippy="csv"  >Скачать  CSV</a>  
 
-                        <th>Артикул</th>
-                        <th>Категория</th>
-                        <th>Ед.</th>
-                        <th  style="text-align: right;">Зак. цена</th>
-                        <th  style="text-align: right;">Кол.</th>
-                        <th  style="text-align: right;">На сумму</th>
-                        <th  style="text-align: right;">Прод. цена</th>
-
-
-
-                    </tr>
-                    <tr zippy="itemlist">
-                        <td zippy="storename"></td>
-                        <td zippy="itemname"></td>
-
-                        <td zippy="code"></td>
-                        <td zippy="cat_name"></td>
-                        <td zippy="msr"></td>
-                        <td zippy="partion" style="text-align: right;"></td>
-                        <td zippy="qty" style="text-align: right;"></td>
-                        <td zippy="amount" style="text-align: right;"></td>
-                        <td zippy="price" style="text-align: right;"></td>
-
-
-                    </tr>
+                <table class="table table-bordered table-responsive-sm table-sm table-hover ">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Склад</th>
+                            <th rowspan="2">Код</th>
+                            <th rowspan="2">Название</th>
+                            <!-- <th>Артикул</th> -->
+                            <th rowspan="2">Категория</th>
+                            <th colspan="3" style="text-align: center;">Количество</th>
+                            <th rowspan="2">Ед. изм.</th>
+                            <th rowspan="2">Зак. цена</th>
+                            <th rowspan="2">На сумму</th>
+                            <th rowspan="2"></th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: right;">Всего</th>
+                            <th style="text-align: right;">Зарезерв.</th>
+                            <th style="text-align: right;">Доступно</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr zippy="itemlist">
+                            <td zippy="storename"></td>
+                            <td zippy="code"></td>
+                            <td zippy="itemname"></td>
+                            <!-- <td></td> -->
+                            <td zippy="cat_name"></td>
+                            <td zippy="qty" style="text-align: right;"></td>
+                            <td zippy="reserved_qty"></td>
+                            <td zippy="available_qty"></td>
+                            <td zippy="msr"></td>
+                            <td zippy="partion" style="text-align: right;"></td>
+                            <td zippy="amount" style="text-align: right;"></td>
+                            <td zippy="price" style="text-align: right;"></td>
+                        </tr>
+                    </tbody>
                 </table>
                 <div zippy="pag"></div>
             </div>
-
-
-
-
         </div>
         <script>
             function check_delete() {

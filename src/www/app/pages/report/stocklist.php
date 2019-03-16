@@ -39,8 +39,6 @@ class StockList extends \App\Pages\Base
         $this->itemtable->itemlist->setPageSize(25);
         $this->itemtable->add(new \Zippy\Html\DataList\Paginator('pag', $this->itemtable->itemlist));
 
-
-
         $this->itemtable->itemlist->Reload();
         $this->add(new ClickLink('csv', $this,'oncsv'));        
         
@@ -54,6 +52,8 @@ class StockList extends \App\Pages\Base
         $row->add(new Label('msr', $stock->msr));
         $row->add(new Label('partion', $stock->partion));
         $row->add(new Label('qty', H::fqty($stock->qty)));
+        $row->add(new Label('reserved_qty', H::fqty($stock->reserved_quantity)));
+        $row->add(new Label('available_qty', H::fqty($stock->qty - $stock->reserved_quantity)));
         $row->add(new Label('amount', round($stock->qty * $stock->partion)));
 
         $item = Item::load($stock->item_id) ;
