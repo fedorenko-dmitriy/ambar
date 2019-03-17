@@ -125,6 +125,8 @@ class BindedTextInput extends TextInput implements Requestable
                 var td = '';
                 if(row.item_code) td = td + '<td>'+row.item_code+'</td>'; 
                 if(row.itemname) td = td + '<td>'+row.itemname+'</td>';
+                if(row.price) td = td + '<td>'+row.price+'</td>';
+                if(row.currency_name) td = td + '<td>'+row.currency_name+'</td>';
                 if(row.qty) td = td + '<td>'+row.qty+'</td>';
                 if(row.msr) td = td + '<td>'+row.msr+'</td>';
 

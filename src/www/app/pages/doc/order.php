@@ -22,7 +22,9 @@ use \App\Entity\Messure;
 use \App\Entity\Item;
 use \App\Entity\Stock;
 use \App\Entity\Store;
+use \App\Entity\Currency;
 use \App\Entity\Reservation; 
+use \App\System;
 use \App\Helper as H;
 use \App\Application as App;
 
@@ -182,14 +184,16 @@ class Order extends \App\Pages\Base
 
     public function editOnClick($sender) {
         $item = $sender->getOwner()->getDataItem();
+
         $this->editdetail->setVisible(true);
-        $this->docform->setVisible(false);
+        $this->docform->setVisible(true);
 
         $this->editdetail->editquantity->setText($item->quantity);
         $this->editdetail->editprice->setText($item->price_selling);
 
-        $this->editdetail->edittovar->setKey($item->item_id);
-        $this->editdetail->edittovar->setText($item->itemname);
+        $this->editdetail->edittovar->setKey($item->stock_id);
+        $stock_item = $this->getStockList($item->itemname, "list")[$item->stock_id];
+        $this->editdetail->edittovar->setText($stock_item);
 
         $this->_rowid = $item->item_id;
     }
@@ -504,29 +508,22 @@ class Order extends \App\Pages\Base
     }
 
     public function OnAutoItem($sender) {
-       $where = "qty <> 0 ";
+        $req = $sender->getText();
 
-        $store = $this->docform->store->getValue();
-        if ($store > 0) {
-            $where = $where . " and store_id=" . $store;
-        }
-
-        $text = Stock::qstr('%' . $sender->getText() . '%');
- 
-        $res = Stock::find($where . " and (itemname like {$text} or item_code like {$text} ) ", "itemname asc");
-
-        $array = array();
-        $messures = Messure::findArray("messure_short_name");
-
-        foreach ($res as $stock_item) { 
-            $messure = $messures[Item::findOne("item_id=".$stock_item->item_id)->msr_id];
-            $array[$stock_item->stock_id] = $stock_item->itemname. " | " . $stock_item->qty ." ". $messure;
-        }
+        $array = $this->getStockList($req, "list");
 
         return $array;
     }
 
     public function OnAutoItem2($sender) {
+        $req = $sender->getText();
+
+        $array = $this->getStockList($req, "grid");
+
+        return $array;
+    }
+
+    private function getStockList($req, $type){
         $where = "qty <> 0 ";
 
         $store = $this->docform->store->getValue();
@@ -534,26 +531,34 @@ class Order extends \App\Pages\Base
             $where = $where . " and store_id=" . $store;
         }
 
-        $text = Stock::qstr('%' . $sender->getText() . '%');
+        $text = Stock::qstr('%' . $req . '%');
  
         $res = Stock::find($where . " and (itemname like {$text} or item_code like {$text} ) ", "itemname asc");
 
-        $array1 = array();
-        $array2 = array();
-
+        $formated_resp_array = array();
         $messures = Messure::findArray("messure_short_name");
+        $currency_name = Currency::findArray("currency_main_name")[System::getOptions("common")["default_currency"]];
 
-        foreach ($res as $item) {
-            $array1["stock_id"] = $item->stock_id;
-            $array1["item_code"] = $item->item_code;
-            $array1["itemname"] = $item->itemname;
-            $array1["msr"] = $messures[Item::findOne("item_id=".$item->item_id)->msr_id];
-            $array1["qty"] = $item->qty;
+        foreach ($res as $stock_item) { 
+            $messure = $messures[Item::findOne("item_id=".$stock_item->item_id)->msr_id];
 
-            $array2[] = $array1;
+            if($type == "list"){
+                $formated_res = $stock_item->itemname. " | ". H::famt($stock_item->partion) . " ".$currency_name. " | " . H::fqty($stock_item->qty) ." ". $messure;
+            } else if ($type == "grid") {
+                $formated_res = array();
+                $formated_res["stock_id"] = $stock_item->stock_id;
+                $formated_res["item_code"] = $stock_item->item_code;
+                $formated_res["itemname"] = $stock_item->itemname;
+                $formated_res["price"] = $stock_item->partion;
+                $formated_res["currency_name"] = $currency_name;
+                $formated_res["qty"] = $stock_item->qty-$stock_item->reserved_quantity;
+                $formated_res["msr"] = $messure;
+            }
+
+            $formated_res_array[$stock_item->stock_id] = $formated_res;
         }
-
-        return $array2;
+        
+        return $formated_res_array;
     }
 
     //добавление нового контрагента
