@@ -16,6 +16,8 @@ use \Zippy\Html\Link\ClickLink;
 use \Zippy\Html\Link\SubmitLink;
 use \App\Entity\Customer;
 use \App\Entity\Doc\Document;
+use \App\Entity\Messure;
+use \App\Entity\Currency;
 use \App\Entity\Item;
 use \App\Entity\Stock;
 use \App\Entity\Store;
@@ -51,7 +53,7 @@ class GoodsIssue extends \App\Pages\Base
 
         $this->docform->add(new DropDownChoice('store', Store::getList(), H::getDefStore()))->onChange($this, 'OnChangeStore');
 
-      $this->docform->add(new Label('discount'))->setVisible(false);
+        $this->docform->add(new Label('discount'))->setVisible(false);
          $this->docform->add(new SubmitLink('addcust'))->onClick($this, 'addcustOnClick');
 
         $this->docform->add(new AutocompleteTextInput('customer'))->onText($this, 'OnAutoCustomer');
@@ -76,22 +78,19 @@ class GoodsIssue extends \App\Pages\Base
 
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
 
-        $this->docform->add(new Label('total'));
+        $this->docform->add(new Label('total_amount'));
+        $this->docform->add(new Label('total_quantity'));
 
-
+        //Добавление нового товара в счет-фактуру
         $this->add(new Form('editdetail'))->setVisible(false);
+        $this->editdetail->add(new AutocompleteTextInput('edittovar'))->onText($this, 'OnAutoItem');
         $this->editdetail->add(new TextInput('editquantity'))->setText("1");
         $this->editdetail->add(new TextInput('editprice'));
 
-        $this->editdetail->add(new AutocompleteTextInput('edittovar'))->onText($this, 'OnAutoItem');
-        $this->editdetail->edittovar->onChange($this, 'OnChangeItem', true);
+        $this->editdetail->edittovar->onChange($this, 'OnChangeItem', true); //ToDo Выяснить что за метод!
 
-
-
-        $this->editdetail->add(new Label('qtystock'));
-
-        $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelrowOnClick');
-        $this->editdetail->add(new SubmitButton('submitrow'))->onClick($this, 'saverowOnClick');
+        $this->editdetail->add(new Button('cancelrow'))->onClick($this, 'cancelRowOnClick');
+        $this->editdetail->add(new SubmitButton('saverow'))->onClick($this, 'saveRowOnClick');
 
         //добавление нового контрагента
         $this->add(new Form('editcust'))->setVisible(false);
@@ -199,17 +198,39 @@ class GoodsIssue extends \App\Pages\Base
     public function detailOnRow($row) {
         $item = $row->getDataItem();
 
-        $row->add(new Label('tovar', $item->itemname));
-        $row->add(new Label('partion', $item->partion));
         $row->add(new Label('code', $item->item_code));
+        $row->add(new Label('tovar', $item->itemname));
+        // $row->add(new Label('partion', $item->partion));
+        $row->add(new Label('barcode', $item->bar_code));
         $row->add(new Label('msr', $item->msr));
 
         $row->add(new Label('quantity', H::fqty($item->quantity)));
-        $row->add(new Label('price', $item->price));
 
-        $row->add(new Label('amount', round($item->quantity * $item->price)));
+        $row->add(new Label('price_1', H::famt($item->price)));
+        $row->add(new Label('amount_1', H::famt($item->quantity * $item->price)));
+
+        $row->add(new Label('price_2', H::famt($item->price)));
+        $row->add(new Label('amount_2', H::famt($item->quantity * $item->price)));
+
         $row->add(new ClickLink('delete'))->onClick($this, 'deleteOnClick');
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
+    }
+
+    public function editOnClick($sender) {
+        $stock = $sender->getOwner()->getDataItem();
+        $this->editdetail->setVisible(true);
+        $this->docform->setVisible(false);
+
+        $this->editdetail->editquantity->setText($stock->quantity);
+        $this->editdetail->editprice->setText($stock->price);
+
+        $this->editdetail->edittovar->setKey($stock->stock_id);
+        $this->editdetail->edittovar->setText($stock->itemname);
+
+
+        // $this->editdetail->qtystock->setText(Stock::getQuantity($stock->stock_id));
+
+        $this->_rowid = $stock->stock_id;
     }
 
     public function deleteOnClick($sender) {
@@ -224,34 +245,16 @@ class GoodsIssue extends \App\Pages\Base
         $this->calcTotal();
     }
 
+     //Добавление одного товара
     public function addrowOnClick($sender) {
         $this->editdetail->setVisible(true);
         $this->editdetail->editquantity->setText("1");
         $this->editdetail->editprice->setText("0");
-        $this->editdetail->qtystock->setText("");
-        $this->docform->setVisible(false);
+        $this->docform->setVisible(true);
         $this->_rowid = 0;
     }
 
-    public function editOnClick($sender) {
-        $stock = $sender->getOwner()->getDataItem();
-        $this->editdetail->setVisible(true);
-        $this->docform->setVisible(false);
-
-        $this->editdetail->editquantity->setText($stock->quantity);
-        $this->editdetail->editprice->setText($stock->price);
-
-
-        $this->editdetail->edittovar->setKey($stock->stock_id);
-        $this->editdetail->edittovar->setText($stock->itemname);
-
-
-        $this->editdetail->qtystock->setText(Stock::getQuantity($stock->stock_id));
-
-        $this->_rowid = $stock->stock_id;
-    }
-
-    public function saverowOnClick($sender) {
+    public function saveRowOnClick($sender) {
 
         $id = $this->editdetail->edittovar->getKey();
         if ($id == 0) {
@@ -282,7 +285,7 @@ class GoodsIssue extends \App\Pages\Base
         $this->calcTotal();
     }
 
-    public function cancelrowOnClick($sender) {
+    public function cancelRowOnClick($sender) {
         $this->editdetail->setVisible(false);
         $this->docform->setVisible(true);
         //очищаем  форму
@@ -331,7 +334,7 @@ class GoodsIssue extends \App\Pages\Base
             $this->_doc->detaildata[] = $tovar->getData();
         }
 
-        $this->_doc->amount = $this->docform->total->getText();
+        $this->_doc->amount = $this->docform->total_amount->getText();
         if ($this->docform->payed->isChecked() == true && $this->_doc->datatag < $this->_doc->amount) {
 
             $this->_doc->addPayment(System::getUser()->user_id, $this->_doc->amount - $this->_doc->datatag);
@@ -398,6 +401,20 @@ class GoodsIssue extends \App\Pages\Base
     }
 
     /**
+     * Расчет  общего количества
+     *
+     */
+    private function calcOrderQuantity() {
+
+        $quantity = 0;
+
+        foreach ($this->_tovarlist as $item) {
+            $quantity = $quantity + $item->quantity;
+        }
+        $this->docform->total_quantity->setText(H::fqty($quantity));
+    }
+
+    /**
      * Расчет  итого
      *
      */
@@ -410,7 +427,7 @@ class GoodsIssue extends \App\Pages\Base
 
             $total = $total + $item->amount;
         }
-        $this->docform->total->setText($total);
+        $this->docform->total_amount->setText(H::famt($total));
     }
 
     /**
@@ -433,6 +450,13 @@ class GoodsIssue extends \App\Pages\Base
         return !$this->isError();
     }
 
+    public function beforeRender() {
+        parent::beforeRender();
+
+        $this->calcTotal();
+        $this->calcOrderQuantity();
+    }
+
     public function backtolistOnClick($sender) {
         App::RedirectBack();
     }
@@ -444,19 +468,19 @@ class GoodsIssue extends \App\Pages\Base
     }
 
     public function OnChangeItem($sender) {
-        $id = $sender->getKey();
-        $stock = Stock::load($id);
-        $this->editdetail->qtystock->setText($stock->qty);
+        // $id = $sender->getKey();
+        // $stock = Stock::load($id);
+        // $this->editdetail->qtystock->setText($stock->qty);
 
-        $item = Item::load($stock->item_id);
-        $price = $item->getPrice($this->docform->pricetype->getValue(), $stock->partion > 0 ? $stock->partion : 0);
-        $price = $price - $price / 100 * $this->_discount;
+        // $item = Item::load($stock->item_id);
+        // $price = $item->getPrice($this->docform->pricetype->getValue(), $stock->partion > 0 ? $stock->partion : 0);
+        // $price = $price - $price / 100 * $this->_discount;
 
 
 
-        $this->editdetail->editprice->setText($price);
+        // $this->editdetail->editprice->setText($price);
 
-        $this->updateAjax(array('qtystock', 'editprice'));
+        // $this->updateAjax(array('qtystock', 'editprice'));
     }
 
     public function OnAutoCustomer($sender) {
@@ -480,10 +504,56 @@ class GoodsIssue extends \App\Pages\Base
         }        
     }
 
+    // public function OnAutoItem($sender) {
+    //     $store_id = $this->docform->store->getValue();
+    //     $text = Item::qstr('%' . $sender->getText() . '%');
+    //     return Stock::findArrayEx("store_id={$store_id} and qty>0    and (itemname like {$text} or item_code like {$text}) ");
+    // }
+
     public function OnAutoItem($sender) {
-        $store_id = $this->docform->store->getValue();
-        $text = Item::qstr('%' . $sender->getText() . '%');
-        return Stock::findArrayEx("store_id={$store_id} and qty>0    and (itemname like {$text} or item_code like {$text}) ");
+        $req = $sender->getText();
+
+        $array = $this->getStockList($req, "list");
+
+        return $array;
+    }
+
+    private function getStockList($req, $type){
+        $where = "qty <> 0 ";
+
+        $store = $this->docform->store->getValue();
+        if ($store > 0) {
+            $where = $where . " and store_id=" . $store;
+        }
+
+        $text = Stock::qstr('%' . $req . '%');
+ 
+        $res = Stock::find($where . " and (itemname like {$text} or item_code like {$text} ) ", "itemname asc");
+
+        $formated_resp_array = array();
+        $messures = Messure::findArray("messure_short_name");
+        $currency_name = Currency::findArray("currency_main_name")[System::getOptions("common")["default_currency"]];
+
+        foreach ($res as $stock_item) { 
+            $messure = $messures[Item::findOne("item_id=".$stock_item->item_id)->msr_id];
+
+            if($type == "list"){
+                $formated_res = $stock_item->itemname. " | ". H::famt($stock_item->partion) . " ".$currency_name. " | " . H::fqty($stock_item->qty) ." ". $messure;
+            } else if ($type == "grid") {
+                $formated_res = array();
+                $formated_res["stock_id"] = $stock_item->stock_id;
+                $formated_res["item_code"] = $stock_item->item_code;
+                $formated_res["itemname"] = $stock_item->itemname;
+                $formated_res["price"] = $stock_item->partion;
+                $formated_res["currency_name"] = $currency_name;
+                $formated_res["qty"] = $stock_item->qty-$stock_item->reserved_quantity;
+                $formated_res["msr"] = $messure;
+            }
+
+            $formated_res_array[$stock_item->stock_id] = $formated_res;
+        }
+        
+        return $formated_res_array;
     }
 
     public function OnChangePriceType($sender) {
