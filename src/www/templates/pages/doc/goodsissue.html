@@ -99,6 +99,7 @@
             <div class="row">
                 <div class="col-12">
                     <a zippy="addrow">Добавить товар</a>
+                    <a zippy="addrows">Массовый ввод</a>
                     <table class="table table-bordered table-sm">
                         <thead>
                             <tr>
@@ -207,6 +208,49 @@
             </div>
             <div class="modal-backdrop fade show"></div>
         </form>
+
+        <form zippy="additems" onkeypress="return event.keyCode != 13;> 
+            <h4>Массовый ввод товара </h4>
+            <div class="form-group">
+                <label for="edititem">Название</label>
+                <input placeholder="Начните вводить..." class="form-control " zippy="addItem" />
+            </div>
+            <div class="row">
+                <div class="col-4 selectedItems">
+                    <div class="row">
+                        <div class="col-12 form-group">
+                            <button type="submit" zippy="saveAddedItems" class="btn btn-outline-primary">Сохранить</button> 
+                            <button type="button" zippy="cancelAddItems" class="btn btn-light ">Отменить</button> 
+                        </div>
+                    </div> 
+                </div>
+                <div class="col-8 reference">
+                    <table class="table table-bordered table-striped table-sm ">
+                        <thead>
+                            <tr>
+                                <th>Код</th>
+                                <th>Наименование</th>
+                                <th>Цена</th>
+                                <th>Валюта</th>
+                                <th>Кол.</th>
+                                <th>Ед.изм.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr zippy="warehouse">
+                                <td zippy="code"></td>
+                                <td zippy="item"></td>
+                                <td zippy="price"></td>
+                                <td zippy="price"></td>
+                                <td zippy="quantity"></td>
+                                <td zippy="msr"></td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
+
         <form zippy="editcust">
             <h3>&nbsp;Новый контрагент </h3>
             <div class="row">

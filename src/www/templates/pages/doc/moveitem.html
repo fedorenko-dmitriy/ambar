@@ -13,59 +13,91 @@
                         <label for="document_number" >Номер документа</label>
                         <input class="form-control" type="text" zippy="document_number" >
                     </div>
+                </div>
+                <div class="col-12 col-md-3">
                     <div class="form-group">
                         <label for="document_date" > Дата</label>
                         <input class="form-control" type="text" zippy="document_date" required="required">
                     </div>
-                    <div class="form-group  ">
+                </div>
+            </div>
+           <div class="row">
+                <div class="col-12 col-md-3">
+                    <h4>Откуда</h4>
+                    <div class="form-group ">
                         <label for="storefrom" >Со склада</label>
                         <select class="form-control" zippy="storefrom">
                         </select>
                     </div>
-                    <div class="form-group  ">
+                    <div class="form-group ">
+                        <label >МОЛ</label>
+                        <select class="form-control"></select>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <h4>Куда</h4>
+                    <div class="form-group ">
                         <label for="storeto" >На склад</label>
-                        <select class="form-control" zippy="storeto">
-                        </select>
+                        <select class="form-control" zippy="storeto"></select>
                     </div>
-                    <div class="form-group  ">
+                    <div class="form-group ">
+                        <label >МОЛ</label>
+                        <select class="form-control"></select>
+                    </div>
+                </div>
+            </div>                      
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="form-group ">
                         <label for="notes" >Примечание </label>
-
                         <input class="form-control" type="text" zippy="notes">
-
                     </div>
-
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-6">
-                    <table class="table table-sm">
-                        <tr>
-                            <th>Название</th>
-                            <th>Ед.</th>
-
-                            <th width="40"  class="text-right" >Кол.</th>
-                            <th width="40"  class="text-right" >Цена</th>
-                            <th width="50"></th>
-                        </tr>
-                        <tr zippy="detail">
-                            <td zippy="item"></td>
-                            <td zippy="msr"></td>
-
-                            <td zippy="quantity"  class="text-right" ></td>
-                            <td zippy="price"  class="text-right" ></td>
-                            <td><a zippy="edit"><i class="fa fa-edit"></i> <a zippy="delete"><i class="fa fa-trash"></i></a></td>
-                        </tr>
+                <div class="col-12">
+                    <a zippy="addrow">Добавить позицию</a>
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Код</th>
+                                <th>Наименование</th>
+                                <th>Штрихкод</th>
+                                <th>Ед.</th>
+                                <th>Кол.</th>
+                                <th>Цена</th>
+                                <th>Сумма</th>
+                                <th>Остаток</th>
+                                <th width="50"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           <tr zippy="detail">
+                                <td></td>
+                                <td></td>
+                                <td zippy="item"></td>
+                                <td>//ToDo Barcode</td>
+                                <td zippy="msr"></td>
+                                <td zippy="quantity"  class="text-right" ></td>
+                                <td zippy="price"  class="text-right" ></td>
+                                <td zippy="amount"  class="text-right" ></td>
+                                <td>//ToDo Balance</td>
+                                <td>
+                                    <a zippy="edit"><i class="fa fa-edit"></i></a>
+                                    <a zippy="delete"><i class="fa fa-trash"></i></a>
+                                </td>
+                            </tr> 
+                        </tbody>
+                        <tfoot></tfoot>
                     </table>
-                    <a zippy="addrow">Добавить товар</a>
-
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-6">
-                    <input type="button" value="Отменить" zippy="backtolist" class="btn   btn-light">
-                    &nbsp; <input zippy="savedoc" type="submit" value="Сохранить" class="btn   btn-outline-primary">
-                    &nbsp;<input zippy="execdoc" type="submit" value="Провести" class="btn btn-primary  ">
-
+                <div class="col-12">
+                    <button type="button" zippy="backtolist" class="btn btn-light float-right">Отменить</button>
+                    <button zippy="savedoc" type="submit" class="btn btn-outline-primary float-right">Сохранить</button>
+                    <button zippy="execdoc" type="submit" class="btn btn-primary float-right">Провести</button>
                 </div>
             </div>
 

@@ -4,6 +4,7 @@ namespace App\Pages\Doc;
 
 use \Zippy\Html\DataList\DataView;
 use \Zippy\Html\Form\AutocompleteTextInput;
+use \App\Html\Form\BindedTextInput;
 use \Zippy\Html\Form\Button;
 use \Zippy\Html\Form\CheckBox;
 use \Zippy\Html\Form\Date;
@@ -70,16 +71,25 @@ class GoodsIssue extends \App\Pages\Base
         $this->docform->add(new TextInput('ship_address'));
 
 
+        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addRowOnClick');
+        $this->docform->add(new SubmitLink('addrows'))->onClick($this, 'addRowsOnClick');
 
-        $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addrowOnClick');
-        $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'savedocOnClick');
-        $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'savedocOnClick');
-        $this->docform->add(new SubmitButton('senddoc'))->onClick($this, 'savedocOnClick');
+        $this->docform->add(new SubmitButton('savedoc'))->onClick($this, 'saveDocOnClick');
+        $this->docform->add(new SubmitButton('execdoc'))->onClick($this, 'saveDocOnClick');
+        $this->docform->add(new SubmitButton('senddoc'))->onClick($this, 'saveDocOnClick');
 
         $this->docform->add(new Button('backtolist'))->onClick($this, 'backtolistOnClick');
 
         $this->docform->add(new Label('total_amount'));
         $this->docform->add(new Label('total_quantity'));
+
+        // Массовое добавление  товаров в счет-фактуру
+        $this->add(new Form('additems'))->setVisible(false);
+        $this->additems->add(new BindedTextInput('addItem', ".reference table"))->onText($this, 'OnAutoItem2');
+
+        $this->additems->add(new Button('cancelAddItems'))->onClick($this, 'cancelAddItemsOnClick');
+        $this->additems->add(new SubmitButton('saveAddedItems'))->onClick($this, 'saveAddedItemsOnClick');
+
 
         //Добавление нового товара в счет-фактуру
         $this->add(new Form('editdetail'))->setVisible(false);
@@ -246,7 +256,7 @@ class GoodsIssue extends \App\Pages\Base
     }
 
      //Добавление одного товара
-    public function addrowOnClick($sender) {
+    public function addRowOnClick($sender) {
         $this->editdetail->setVisible(true);
         $this->editdetail->editquantity->setText("1");
         $this->editdetail->editprice->setText("0");
@@ -297,7 +307,65 @@ class GoodsIssue extends \App\Pages\Base
         $this->editdetail->editprice->setText("");
     }
 
-    public function savedocOnClick($sender) {
+     // Массовый ввод    
+    public function addRowsOnClick($sender) {
+        $this->additems->setVisible(true);
+        $this->docform->setVisible(false);
+    }
+
+    public function cancelAddItemsOnClick(){
+        $this->additems->setVisible(false);
+        $this->docform->setVisible(true);
+    }
+
+    public function saveAddedItemsOnClick(){
+        $isItemsLacks;
+        $value = $this->additems->addItem->getKey();
+
+        $arr = explode("||", $value);
+        if (count($arr) == 1 && count(explode("_", $arr[0]))<3) {
+            $this->setError("Не выбран товар");
+            return;
+        }
+
+        foreach ($arr as $key => $item) {
+            $arr2 = explode("_", $item);
+            $stock_id = $arr2[0];
+            $quantity = $arr2[1]; 
+            $price = $arr2[2];
+
+            $stock = Stock::findOne("stock_id='".$stock_id."'");
+            $item = Item::load($stock->item_id);
+            $item->quantity = $quantity;
+
+            //ToDo подготовит полноценную валидацию количества товара
+            // $msr = Messure::findOne("messure_id='".$item->msr_id."'");
+
+            // if($item->quantity > $stock->qty){
+            //     $this->setError("Нет такого количества товара в наличии. На складе всего ". $stock->qty ."".$msr->messure_short_name. " ". $item->itemname);
+            //     $isItemsLacks = true;
+            //     break;
+            // }
+
+            $item->stock_id = $stock_id;
+            $item->price = $stock->partion;
+            $item->price_selling = $price;
+
+            unset($this->_tovarlist[$this->_rowid]);
+            $this->_tovarlist[$item->item_id] = $item;            
+        }
+
+        // if($isItemsLacks) return;
+
+        $this->additems->addItem->clean();
+        $this->additems->setVisible(false);
+        $this->docform->setVisible(true);
+        $this->docform->detail->Reload();
+    }
+
+    // Сохранение всего документа
+
+    public function saveDocOnClick($sender) {
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
         $this->_doc->document_number = $this->docform->document_number->getText();
@@ -514,6 +582,14 @@ class GoodsIssue extends \App\Pages\Base
         $req = $sender->getText();
 
         $array = $this->getStockList($req, "list");
+
+        return $array;
+    }
+
+    public function OnAutoItem2($sender) {
+        $req = $sender->getText();
+
+        $array = $this->getStockList($req, "grid");
 
         return $array;
     }
