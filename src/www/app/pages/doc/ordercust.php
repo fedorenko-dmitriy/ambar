@@ -281,7 +281,9 @@ class OrderCust extends \App\Pages\Base
         );
         $this->_doc->detaildata = array();
         foreach ($this->_itemlist as $item) {
-            $this->_doc->detaildata[] = $item->getData();
+            $detaildata = $item->getData();
+            unset($detaildata["detail"]);
+            $this->_doc->detaildata[] = $detaildata;
         }
 
         $this->_doc->amount = $this->docform->total->getText();
