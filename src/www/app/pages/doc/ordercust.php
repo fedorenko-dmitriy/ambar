@@ -259,7 +259,6 @@ class OrderCust extends \App\Pages\Base
             return;
         }
         $old = $this->_doc->cast();
-        $this->calcTotal();
 
         // $common = System::getOptions("common");
         $order_quantity = 0;
@@ -269,14 +268,13 @@ class OrderCust extends \App\Pages\Base
         //         continue;
         //     if ($common['useval'] != true)
         //         continue;
-            $order_quantity = $order_quantity + intval($item->quantity);
             $item->currency_id = $currency_id;
         }
 
         $this->_doc->headerdata = array(
             'currency_id' => $currency_id,
-            'order_quantity' => $order_quantity,
-            'total' => $this->docform->total->getText()
+            'order_quantity' => $this->calcOrderQuantity(),
+            'total' => $this->calcTotal()
         );
         $this->_doc->detaildata = array();
         foreach ($this->_itemlist as $item) {
@@ -361,7 +359,8 @@ class OrderCust extends \App\Pages\Base
         foreach ($this->_itemlist as $item) {
             $quantity = $quantity + $item->quantity;
         }
-        $this->docform->order_quantity->setText(H::fqty($quantity));
+
+        return $quantity;
     }
 
     /**
@@ -376,7 +375,8 @@ class OrderCust extends \App\Pages\Base
             $item->amount_income = $item->price_income * $item->quantity;
             $total = $total + $item->amount_income;
         }
-        $this->docform->total->setText(H::famt($total));
+
+        return $total;
     }
 
     /**
@@ -401,8 +401,8 @@ class OrderCust extends \App\Pages\Base
     public function beforeRender() {
         parent::beforeRender();
 
-        $this->calcTotal();
-        $this->calcOrderQuantity();
+        $this->docform->total->setText(H::famt($this->calcTotal()));
+        $this->docform->order_quantity->setText(H::fqty($this->calcOrderQuantity()));
     }
 
     public function backtolistOnClick($sender) {
