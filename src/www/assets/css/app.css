@@ -314,3 +314,11 @@ body.user-login .row.justify-content-center{
 .reference thead {
     width: calc( 100% - 1em ) /*scrollbar is average 1em/16px width, remove it from thead width */
 }
+
+
+/*Export page*/
+.export-tables{
+    height: 210px;
+    background-color: #fff;
+    overflow-y: scroll;
+}

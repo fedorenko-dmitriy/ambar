@@ -1,0 +1,66 @@
+<html>
+
+    <body>
+        <div class="row">
+            <div class="col-12 col-lg-10 ">
+                <h3>Экспорт базы данных</h3>
+                <form zippy="exportform" class="row">
+                    <div class="col-5">
+                        <div class="form-group  ">
+                            <label><b>Экспорт</b></label>
+                        </div> 
+                        <div class="form-group  ">
+                            <label for="export_filetype" >Тип файла</label>
+                            <select zippy="export_filetype" class="form-control"></select>
+                        </div> 
+                        <div class="form-group  ">
+                            <label for="export_filepath" >Имя файла</label>
+                            <input zippy="export_filename" class="form-control" /> 
+                        </div>       
+                        <div class="form-group  ">
+                            <label for="export_filepath" >Путь сохранения</label>
+                            <input zippy="export_filepath" class="form-control" /> 
+                        </div>     
+                        <div class="form-group  ">
+                            <label for="export_tables" >Таблицы для экспорта</label>
+                            <div zippy="export_tables" class="form-check" ></div>
+                        </div>                          
+                        <div class="form-group  ">
+                            <button zippy="export" class="btn btn-info" type="submit" >Выгрузить</button>
+                        </div> 
+                    </div>
+                    <div class="col-2"> </div>
+                    <div class="col-5">     
+                        <div class="form-group  ">
+                            <label><b>Настройка периодического экспорта</b> </label>
+                        </div>    
+                        <div class="form-group  ">
+                            <label for="backup_frequency" >Периодичность бекапа</label>
+                            <select zippy="backup_frequency" class="form-control"></select>
+                        </div>
+                        <div class="form-group  ">
+                            <label for="backup_start" >Старт</label>
+                            <select zippy="backup_start" class="form-control"></select>
+                        </div>    
+                        <div class="form-group  ">
+                            <label for="backup_filetype" >Тип файла</label>
+                            <select zippy="backup_filetype" class="form-control">
+                            </select>
+                        </div>    
+                        <div class="form-group  ">
+                            <label for="backup_filepath" >Имя файла</label>
+                            <input zippy="backup_filename" class="form-control" /> 
+                        </div>    
+                        <div class="form-group  ">
+                            <label for="backup_filepath" >Путь сохранения</label>
+                            <input zippy="backup_filepath" class="form-control" /> 
+                        </div>
+                        <div class="form-group  ">
+                            <button class="btn btn-info" type="submit" >Создать расписание</button>
+                        </div> 
+                    </div>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
