@@ -48,46 +48,21 @@ class Export extends \App\Pages\Base
         }
 
         $form->add(new SubmitButton("export"))->onClick($this, "onExport");
-
-///////////////
-
-        $form->add(new DropDownChoice("backup_frequency", 
-            array(
-                0 => 'Выберите частоту сохранений',
-                1 => 'Каждый час', 
-                2 => 'Каждые 12 часов',
-                3 => 'Каждый день',
-                4 => 'Каждую неделю',
-                5 => 'Каждый месяц',
-            ), 0));
-        $form->add(new DropDownChoice("backup_filetype", 
-            array(
-                0 => 'Выберите тип файла',
-                1 => 'sql'
-                // 2 => 'csv'
-            ), 1));
-        $form->add(new TextInput("backup_start"));
-        $form->add(new TextInput("backup_filename"));
-        $form->add(new TextInput("backup_filepath"));
-
-        // $form->add(new SubmitButton("export"))->onClick($this, "onBackup");
     }
 
     public function onExport (){
         $export_filename        = $this->exportform->export_filename->getValue();
         $export_filetype        = $this->exportform->export_filetype->getValueName();
-        $export_file = $export_filename .".". $export_filetype;
-        $tables                 = $this->exportform->export_tables->getCheckedList();
+        $export_tables          = $this->exportform->export_tables->getCheckedList();
 
-        $this->exportDatabase($tables, $export_file);
+        $export_filename = $export_filename ? $export_filename : "dump";
+        $export_file = $export_filename."__".date('H-i-s')."_".date('d-m-Y')."__".rand(1,11111111).$export_filetype;
+
+        $this->exportDatabase($export_tables, $export_file);
         //or add 5th parameter(array) of specific tables:    array("mytable1","mytable2","mytable3") for multiple tables
     }
 
-    public function onBackup(){
-        // $this->exportDatabase($tables=false, $export_file);
-    }
-
-    public function exportDatabase($tables=false, $backup_name=false )
+    private function exportDatabase($tables=false, $backup_name)
     {
         $conn = \ZDB\DB::getConnect();
         $conn->Execute("SET NAMES 'utf8'");
@@ -147,7 +122,8 @@ class Export extends \App\Pages\Base
                 }
             } $content .="\n\n\n";
         }
-        $backup_name = $backup_name ? $backup_name : $name."___(".date('H-i-s')."_".date('d-m-Y').")__rand".rand(1,11111111).".sql";
+        
+
         header('Content-Type: application/octet-stream');   
         header("Content-Transfer-Encoding: Binary"); 
         header("Content-disposition: attachment; filename=\"".$backup_name."\"");  
