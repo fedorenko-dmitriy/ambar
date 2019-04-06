@@ -249,7 +249,6 @@ class OrderCust extends \App\Pages\Base
         if (false == \App\ACL::checkEditDoc($this->_doc))
             return;
 
-
         $this->_doc->document_number = $this->docform->document_number->getText();
         $this->_doc->document_date = $this->docform->document_date->getDate();
         $this->_doc->currency_id = $this->docform->document_currency->getValue();
@@ -282,7 +281,9 @@ class OrderCust extends \App\Pages\Base
         $this->_doc->detaildata = array();
         foreach ($this->_itemlist as $item) {
             $detaildata = $item->getData();
-            unset($detaildata["detail"]);
+
+            $detaildata = $this->removeExcessFields($detaildata);
+
             $this->_doc->detaildata[] = $detaildata;
         }
 
@@ -311,8 +312,6 @@ class OrderCust extends \App\Pages\Base
                 $this->_doc->updateStatus($isEdited ? Document::STATE_EDITED : Document::STATE_NEW);
             }
 
- 
-
             if ($this->_basedocid > 0) {
                 $this->_doc->AddConnectedDoc($this->_basedocid);
                 $this->_basedocid = 0;
@@ -338,6 +337,17 @@ class OrderCust extends \App\Pages\Base
         }
 
         App::RedirectBack();
+    }
+    /**
+     * Удаление лишних полей из позиции при сохранении
+     *
+     */
+
+    private function removeExcessFields($detaildata){
+        unset($detaildata["detail"]);
+        unset($detaildata["qty"]);
+
+        return $detaildata;
     }
 
     /**
