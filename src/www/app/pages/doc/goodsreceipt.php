@@ -134,6 +134,7 @@ class GoodsReceipt extends \App\Pages\Base
                     $this->_basedocid = $basedocid;
                    if ($basedoc->meta_name == 'OrderCust') {
                         $this->_order_id = $basedocid;
+                        $this->docform->document_currency->setValue($basedoc->headerdata['currency_id']);
                         $this->docform->customer->setKey($basedoc->customer_id);
                         $this->docform->customer->setText($basedoc->customer_name);
                        
