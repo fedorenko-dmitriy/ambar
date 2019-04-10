@@ -93,6 +93,7 @@ class OrderCust extends \App\Pages\Base
     
             $this->docform->notes->setText($this->_doc->notes);
             $this->docform->document_date->setDate($this->_doc->document_date);
+            $this->docform->document_currency->setValue($headerdata['currency_id']);
             $this->docform->customer->setKey($this->_doc->customer_id);
             $this->docform->customer->setText($this->_doc->customer_name);
 
