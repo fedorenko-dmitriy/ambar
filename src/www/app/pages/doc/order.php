@@ -69,8 +69,8 @@ class Order extends \App\Pages\Base
 
         $this->docform->add(new DropDownChoice('delivery', array(
             1 => 'Самовывоз', 
-            2 => 'Курьер', 
-            3 => 'Почта')
+            2 => 'Курьер по городу', 
+            3 => 'Транспортная компания')
         ))->onChange($this, 'OnDelivery');
 
         $this->docform->add(new TextInput('email'));
