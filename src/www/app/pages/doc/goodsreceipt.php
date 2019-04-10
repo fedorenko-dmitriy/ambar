@@ -349,10 +349,11 @@ class GoodsReceipt extends \App\Pages\Base
 
         $this->_doc->detaildata = array();
         foreach ($this->_itemlist as $item) {
-            $item = $item->getData();
-            $item['currency_id'] = $this->_doc->headerdata['currency_id'];
-            $item['currency_rate'] = $this->_doc->headerdata['currency_rate'];
-            $this->_doc->detaildata[] = $item;
+            $detaildata = $item->getData();
+            $detaildata = $this->removeExcessFields($detaildata);
+            $detaildata['currency_id'] = $this->_doc->headerdata['currency_id'];
+            $detaildata['currency_rate'] = $this->_doc->headerdata['currency_rate'];
+            $this->_doc->detaildata[] = $detaildata;
         }
 
         $this->_doc->amount = intval($this->docform->total_amount->getText());
@@ -408,7 +409,17 @@ class GoodsReceipt extends \App\Pages\Base
         }
         App::RedirectBack();
     }
+    /**
+     * Удаление лишних полей из позиции при сохранении
+     *
+     */
 
+    private function removeExcessFields($detaildata){
+        unset($detaildata["detail"]);
+        unset($detaildata["qty"]);
+
+        return $detaildata;
+    }
 
     /**
      * Расчет  общего количества
