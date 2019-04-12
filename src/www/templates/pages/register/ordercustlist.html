@@ -30,7 +30,7 @@
                         <th>Валюта</th>
                         <th>Номер договора</th>
                         <th></th>
-                        <th></th>
+                        <th colspan="2"></th>
                     </tr>  
                     <tr zippy="doclist">
                         <td zippy="number"></td>
@@ -45,6 +45,15 @@
                         <td class="text-nowrap" >
                             <a zippy="show" title="Просмотр"><i class="fa fa-search-plus"></i></a>
                             <a zippy="edit" title="Редактирование"><i class="fa fa-edit"></i></a>
+                        </td>
+                        <td>
+                            <div class="btn-group" zippy="basedon">
+                                <button title="Создать на  основании" type="button"
+                                        class="btn btn-light btn-sm  dropdown-toggle" data-toggle="dropdown">
+                                    Создать <span class="caret"></span>
+                                </button>
+                                <div class="dropdown-menu" role="menu" zippy="basedlist"></div>
+                            </div>
                         </td>
                     </tr>
                 </table>

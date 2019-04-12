@@ -54,12 +54,10 @@ class OrderCustList extends \App\Pages\Base
 
         $this->add(new Paginator('pag', $doclist));
         $doclist->setPageSize(25);
- 
 
         $this->add(new Panel("statuspan"))->setVisible(false);
 
         $this->statuspan->add(new Form('statusform'));
-
 
         $this->statuspan->statusform->add(new SubmitButton('bclose'))->onClick($this, 'statusOnSubmit');
         $this->statuspan->statusform->add(new SubmitButton('bcancel'))->onClick($this, 'statusOnSubmit');
@@ -78,7 +76,6 @@ class OrderCustList extends \App\Pages\Base
 
     public function filterOnSubmit($sender) {
 
-
         $this->statuspan->setVisible(false);
 
         $this->doclist->Reload();
@@ -86,7 +83,8 @@ class OrderCustList extends \App\Pages\Base
 
     public function doclistOnRow($row) {
         $doc = $row->getDataItem();
-
+        $doc = $doc->cast();
+        
         $row->add(new Label('number', $doc->document_number));
         $row->add(new Label('date', date('d-m-Y', $doc->document_date)));
         $row->add(new Label('state', Document::getStateName($doc->state)));
@@ -103,6 +101,19 @@ class OrderCustList extends \App\Pages\Base
             $row->edit->setVisible(true);
         } else {
             $row->edit->setVisible(false);
+        }
+
+        //список документов   которые   могут  быть созданы  на  основании  текущего
+        $basedon = $row->add(new Label('basedon'));
+        $basedonlist = $doc->getRelationBased();
+        if (count($basedonlist) == 0) {
+            $basedon->setVisible(false);
+        } else {
+            $list = "";
+            foreach ($basedonlist as $doctype => $docname) {
+                $list .= "<a  class=\"dropdown-item\" href=\"/?p=App/Pages/Doc/" . $doctype . "&arg=/0/{$doc->document_id}\">{$docname}</a>";
+            };
+            $basedon = $row->add(new Label('basedlist'))->setText($list, true);
         }
     }
 
