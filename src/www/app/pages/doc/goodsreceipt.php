@@ -11,7 +11,7 @@ use Zippy\Html\Form\Date;
 use Zippy\Html\Form\DropDownChoice;
 use Zippy\Html\Form\Form;
 use Zippy\Html\Form\SubmitButton;
-use Zippy\Html\Form\TextInput;
+use App\Html\Form\TextInput;
 use Zippy\Html\Label;
 use Zippy\Html\Link\ClickLink;
 use Zippy\Html\Link\SubmitLink;
@@ -54,7 +54,7 @@ class GoodsReceipt extends \App\Pages\Base
 
 
         $this->docform->add(new DropDownChoice('document_currency', Currency::findArray("currency_name"), $common["default_currency"]))->onChange($this,"onChangeCurrency");
-        $this->docform->add(new TextInput('document_currency_rate'));
+        $this->docform->add(new TextInput('document_currency_rate'))->onChange($this,"onChangeCurrencyRate");
         $this->docform->document_currency_rate->setAttribute("disabled","disabled");
 
         $this->docform->add(new SubmitLink('addrow'))->onClick($this, 'addRowOnClick');
@@ -137,6 +137,10 @@ class GoodsReceipt extends \App\Pages\Base
                         $this->docform->document_currency->setValue($basedoc->headerdata['currency_id']);
                         $this->docform->customer->setKey($basedoc->customer_id);
                         $this->docform->customer->setText($basedoc->customer_name);
+
+                        if( $basedoc->headerdata['currency_id'] != $common["default_currency"]){
+                            $this->docform->document_currency_rate->setAttribute("disabled", null);
+                        }
                        
                         $this->_orderid = $basedocid;
                         $this->docform->order->setText($basedoc->document_number);
@@ -550,8 +554,12 @@ class GoodsReceipt extends \App\Pages\Base
             $this->docform->document_currency_rate->setValue("");
             $this->docform->document_currency_rate->setAttribute("disabled", "disabled");
         }
+        $this->docform->detail->Reload();
+    }
 
+    public function onChangeCurrencyRate($sender) {
         $this->updateAjax(array('document_currency_rate'));
+        $this->docform->detail->Reload();
     }
 
     //добавление нового товара
