@@ -339,14 +339,13 @@ class GoodsReceipt extends \App\Pages\Base
         }
         $old = $this->_doc->cast();
 
-        $this->calcTotal();
-        $this->convertCurrency();
-
         $this->_doc->headerdata = array(
             'order' => $this->docform->order->getText(),
             'store' => $this->docform->store->getValue(),
             'planned' => $this->docform->planned->isChecked() ? 1 : 0,
-            'total' => $this->docform->total_amount->getText(),
+            'total_quantity' => $this->calcTotalQuantity(),
+            'total_amount' => $this->calcTotalAmount() * $this->getCurrencyRate(),
+            'total_amount_income' => $this->calcTotalAmount(),
             'order_id' => $this->_order_id,
             'currency_id' => $this->docform->document_currency->getValue(),
             'currency_rate' => $this->getCurrencyRate()
@@ -430,21 +429,21 @@ class GoodsReceipt extends \App\Pages\Base
      * Расчет  общего количества
      *
      */
-    private function calcOrderQuantity() {
+    private function calcTotalQuantity() {
 
         $quantity = 0;
 
         foreach ($this->_itemlist as $item) {
             $quantity = $quantity + $item->quantity;
         }
-        $this->docform->total_quantity->setText(H::fqty($quantity));
+        return $quantity;
     }
 
     /**
      * Расчет  итого
      *
      */
-    private function calcTotal() {
+    private function calcTotalAmount() {
 
         $total = 0;
         $currency_rate = $this->getCurrencyRate();
@@ -454,8 +453,8 @@ class GoodsReceipt extends \App\Pages\Base
             $item->amount = ($item->amount_income * $currency_rate);
             $total = $total + $item->amount_income;
         }
-        $this->docform->total_amount_income->setText(H::famt($total));
-        $this->docform->total_amount->setText(H::famt($total * $this->getCurrencyRate()));
+
+        return $total;
     }
 
     /**
@@ -505,8 +504,9 @@ class GoodsReceipt extends \App\Pages\Base
     public function beforeRender() {
         parent::beforeRender();
 
-        $this->calcTotal();
-        $this->calcOrderQuantity();
+        $this->docform->total_amount_income->setText(H::famt($this->calcTotalAmount()));
+        $this->docform->total_amount->setText(H::famt($this->calcTotalAmount() * $this->getCurrencyRate()));
+        $this->docform->total_quantity->setText(H::fqty($this->calcTotalQuantity()));
     }
 
     public function backtolistOnClick($sender) {

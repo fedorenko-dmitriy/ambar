@@ -10,12 +10,13 @@ use Zippy\Html\Form\CheckBox;
 use Zippy\Html\Form\Date;
 use Zippy\Html\Form\DropDownChoice;
 use Zippy\Html\Form\Form;
-use Zippy\Html\Form\TextInput;
+use App\Html\Form\TextInput;
 use Zippy\Html\Form\SubmitButton;
 use Zippy\Html\Panel;
 use Zippy\Html\Label;
 use Zippy\Html\Link\ClickLink;
 use App\Entity\Doc\Document;
+use App\Entity\Currency;
 use App\Helper as H;
 use App\Application as App;
 use App\System;
@@ -25,7 +26,6 @@ use App\System;
  */
 class GRList extends \App\Pages\Base
 {
-
     private $_doc = null;
     public $_pays = array();
 
@@ -54,17 +54,12 @@ class GRList extends \App\Pages\Base
         $this->add(new Paginator('pag', $doclist));
         $doclist->setPageSize(25);
 
-
-
-
         $this->add(new Panel("statuspan"))->setVisible(false);
 
         $this->statuspan->add(new Form('statusform'));
 
         // $this->statuspan->statusform->add(new SubmitButton('bsend'))->onClick($this, 'statusOnSubmit');
         //   $this->statuspan->statusform->add(new SubmitButton('bclose'))->onClick($this, 'statusOnSubmit');
-
-
 
         $this->statuspan->add(new \App\Widgets\DocView('docview'));
         $this->add(new Panel("paypan"))->setVisible(false);
@@ -94,14 +89,16 @@ class GRList extends \App\Pages\Base
         $doc = $row->getDataItem();
 
         $row->add(new Label('number', $doc->document_number));
-
         $row->add(new Label('date', date('d-m-Y', $doc->document_date)));
-        $row->add(new Label('onotes', $doc->notes));
-        $row->add(new Label('amount', $doc->amount));
-        $row->add(new Label('spay', $doc->amount - $doc->datatag));
-        $row->add(new Label('customer', $doc->customer_name));
-
         $row->add(new Label('state', Document::getStateName($doc->state)));
+        $row->add(new Label('customer', $doc->customer_name));
+        $row->add(new Label('total_quantity', H::fqty($doc->headerdata["total_quantity"])));
+        $row->add(new Label('total_amount_income', H::famt($doc->headerdata["total_amount_income"])));
+        $row->add(new Label('currency', Currency::findArray("iso_code")[$doc->headerdata["currency_id"]]));
+        $row->add(new Label('total_amount', H::famt($doc->amount)));
+        // $row->add(new Label('onotes', $doc->notes));
+        
+        // $row->add(new Label('spay', $doc->amount - $doc->datatag));
 
         $row->add(new ClickLink('show'))->onClick($this, 'showOnClick');
         $row->add(new ClickLink('edit'))->onClick($this, 'editOnClick');
@@ -117,9 +114,6 @@ class GRList extends \App\Pages\Base
 
         $state = $this->_doc->state;
 
-
-
-
         $this->doclist->Reload(false);
 
         $this->statuspan->setVisible(false);
@@ -129,8 +123,6 @@ class GRList extends \App\Pages\Base
     }
 
     public function updateStatusButtons() {
-
-
         $state = $this->_doc->state;
     }
 
@@ -154,7 +146,6 @@ class GRList extends \App\Pages\Base
         if (false == \App\ACL::checkEditDoc($doc, true))
             return;
 
-
         App::Redirect("\\App\\Pages\\Doc\\GoodsReceipt", $doc->document_id);
     }
 
@@ -162,9 +153,7 @@ class GRList extends \App\Pages\Base
     public function payOnClick($sender) {
         $this->statuspan->setVisible(false);
 
-
         $this->_doc = $sender->owner->getDataItem();
-
 
         $this->paypan->setVisible(true);
 
@@ -223,37 +212,32 @@ class GRList extends \App\Pages\Base
             //$this->setSuccess('Наряд оплаче и закрыт');    
         }
 
-
-
         $this->doclist->Reload(false);
         $this->paypan->setVisible(false);
     }
 
     public function oncsv($sender) {
-            $list = $this->doclist->getDataSource()->getItems(-1,-1,'document_id');
-            $csv="";
- 
-            foreach($list as $d){
-               $csv.=  date('Y.m.d',$d->document_date) .';';    
-               $csv.=  $d->document_number .';';    
-               $csv.=  $d->customer_name .';';    
-               $csv.=  $d->amount  .';'; 
-               $csv.=  $d->notes .';';     
-               $csv.="\n";
-            }
-            $csv = mb_convert_encoding($csv, "windows-1251", "utf-8");
+        $list = $this->doclist->getDataSource()->getItems(-1,-1,'document_id');
+        $csv="";
 
- 
-            header("Content-type: text/csv");
-            header("Content-Disposition: attachment;Filename=baylist.csv");
-            header("Content-Transfer-Encoding: binary");
+        foreach($list as $d){
+           $csv.=  date('Y.m.d',$d->document_date) .';';    
+           $csv.=  $d->document_number .';';    
+           $csv.=  $d->customer_name .';';    
+           $csv.=  $d->amount  .';'; 
+           $csv.=  $d->notes .';';     
+           $csv.="\n";
+        }
+        $csv = mb_convert_encoding($csv, "windows-1251", "utf-8");
 
-            echo $csv;
-            flush();
-            die;
-            
+        header("Content-type: text/csv");
+        header("Content-Disposition: attachment;Filename=baylist.csv");
+        header("Content-Transfer-Encoding: binary");
+
+        echo $csv;
+        flush();
+        die;
     }
-     
 }
 
 /**
@@ -276,9 +260,6 @@ class GoodsReceiptDataSource implements \Zippy\Interfaces\DataSource
         $where = " date(document_date) >= " . $conn->DBDate($this->page->filter->from->getDate()) . " and  date(document_date) <= " . $conn->DBDate($this->page->filter->to->getDate());
 
         $where .= " and meta_name  = 'GoodsReceipt' ";
-
-
-
 
         $status = $this->page->filter->status->getValue();
 
