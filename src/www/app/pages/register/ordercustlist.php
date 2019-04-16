@@ -89,8 +89,8 @@ class OrderCustList extends \App\Pages\Base
         $row->add(new Label('date', date('d-m-Y', $doc->document_date)));
         $row->add(new Label('state', Document::getStateName($doc->state)));
         $row->add(new Label('customer', $doc->customer_name));
-        $row->add(new Label('quantity', $doc->headerdata["order_quantity"]));
-        $row->add(new Label('amount', $doc->amount));
+        $row->add(new Label('quantity', H::fqty($doc->headerdata["order_quantity"])));
+        $row->add(new Label('amount', H::famt($doc->amount)));
         $row->add(new Label('currency', Currency::findArray("iso_code")[$doc->headerdata["currency_id"]]));
         $row->add(new Label('onotes', $doc->notes));
 
