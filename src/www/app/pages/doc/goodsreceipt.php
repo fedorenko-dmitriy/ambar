@@ -338,13 +338,14 @@ class GoodsReceipt extends \App\Pages\Base
             return;
         }
         $old = $this->_doc->cast();
+        $this->_doc->amount = $this->calcTotalAmount() * $this->getCurrencyRate();
 
         $this->_doc->headerdata = array(
             'order' => $this->docform->order->getText(),
             'store' => $this->docform->store->getValue(),
             'planned' => $this->docform->planned->isChecked() ? 1 : 0,
             'total_quantity' => $this->calcTotalQuantity(),
-            'total_amount' => $this->calcTotalAmount() * $this->getCurrencyRate(),
+            'total_amount' => $this->_doc->amount,
             'total_amount_income' => $this->calcTotalAmount(),
             'order_id' => $this->_order_id,
             'currency_id' => $this->docform->document_currency->getValue(),
@@ -360,7 +361,6 @@ class GoodsReceipt extends \App\Pages\Base
             $this->_doc->detaildata[] = $detaildata;
         }
 
-        $this->_doc->amount = intval($this->docform->total_amount->getText());
         $isEdited = $this->_doc->document_id > 0;
 
         if ($this->docform->payed->isChecked() == true && $this->_doc->datatag < $this->_doc->amount) {
