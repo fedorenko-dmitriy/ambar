@@ -57,7 +57,7 @@ class UserLogin extends \Zippy\Html\WebPage
                 }
                 $logger->info('Logined ' . $user->userlogin . ', ' . $_SERVER["REMOTE_ADDR"]);
                 if (\App\Session::getSession()->topage == null) {
-                    App::RedirectURI('/store');
+                    App::RedirectURI('/');
                 } else {
                     App::RedirectURI(\App\Session::getSession()->topage);
                 }
