@@ -614,15 +614,15 @@ class GoodsIssue extends \App\Pages\Base
             $messure = $messures[Item::findOne("item_id=".$stock_item->item_id)->msr_id];
 
             if($type == "list"){
-                $formated_res = $stock_item->itemname. " | ". H::famt($stock_item->partion) . " ".$currency_name. " | " . H::fqty($stock_item->qty) ." ". $messure;
+                $formated_res = $stock_item->itemname. " | ". H::famt($stock_item->partion) . " ".$currency_name. " | " . H::fqty($stock_item->qty-$stock_item->reserved_quantity) ." ". $messure;
             } else if ($type == "grid") {
                 $formated_res = array();
                 $formated_res["stock_id"] = $stock_item->stock_id;
                 $formated_res["item_code"] = $stock_item->item_code;
                 $formated_res["itemname"] = $stock_item->itemname;
-                $formated_res["price"] = $stock_item->partion;
+                $formated_res["price"] = H::famt($stock_item->partion);
                 $formated_res["currency_name"] = $currency_name;
-                $formated_res["qty"] = $stock_item->qty-$stock_item->reserved_quantity;
+                $formated_res["qty"] = H::fqty($stock_item->qty-$stock_item->reserved_quantity);
                 $formated_res["msr"] = $messure;
             }
 
