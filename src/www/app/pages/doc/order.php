@@ -144,9 +144,10 @@ class Order extends \App\Pages\Base
             $this->docform->phone->setText($this->_doc->headerdata['phone']);
             $this->docform->address->setText($this->_doc->headerdata['address']);
 
+
             foreach ($this->_doc->detaildata as $_item) {
                 $item = new Item($_item);
-                $this->_tovarlist[$item->item_id] = $item;
+                $this->_tovarlist[$item->stock_id] = $item;
             }
         } else {
             $this->_doc = Document::create('Order');
@@ -244,7 +245,7 @@ class Order extends \App\Pages\Base
         $item->price_selling = $this->editdetail->editprice->getText();
 
         unset($this->_tovarlist[$this->_rowid]);
-        $this->_tovarlist[$item->item_id] = $item;
+        $this->_tovarlist[$item->stock_id] = $item;
         $this->editdetail->setVisible(false);
         $this->docform->setVisible(true);
         $this->docform->detail->Reload();
@@ -313,7 +314,7 @@ class Order extends \App\Pages\Base
             $item->price_selling = $price;
 
             unset($this->_tovarlist[$this->_rowid]);
-            $this->_tovarlist[$item->item_id] = $item;            
+            $this->_tovarlist[$item->stock_id] = $item;            
         }
 
         // if($isItemsLacks) return;
